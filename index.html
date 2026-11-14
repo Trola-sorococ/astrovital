@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AstroVital | ZeroG-Pulse</title>
+    <link rel="stylesheet" href="ui/styles.css">
+    <script src="ui/app.js" defer></script>
+</head>
+
+<body>
+    <header>
+        <h1>AstroVital</h1>
+        <p>Sistema de monitoreo biomédico - Equipo ZeroG-Pulse</p>
+    </header>
+
+    <main id="app">
+        <section id="status-panel">
+            <h2>Estado del Sistema</h2>
+            <p id="connection-status">Esperando datos de sensores...</p>
+        </section>
+
+        <section id="metrics-grid">
+            <div class="card">
+                <h3>Frecuencia Cardíaca</h3>
+                <p id="bpm-value">-- BPM</p>
+            </div>
+            <div class="card">
+                <h3>Oxigenación (SpO2)</h3>
+                <p id="spo2-value">-- %</p>
+            </div>
+            <div class="card">
+                <h3>Temperatura</h3>
+                <p id="temp-value">-- °C</p>
+            </div>
+        </section>
+    </main>
+</body>
+
+</html>
