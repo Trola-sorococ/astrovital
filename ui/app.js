@@ -8,8 +8,8 @@ const statusEl = document.getElementById('connection-status');
 
 // 1. Escena, Cámara y Renderizador
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(38, container.clientWidth / container.clientHeight, 0.05, 100);
-camera.position.set(0, 0.95, 2.1);
+const camera = new THREE.PerspectiveCamera(36, container.clientWidth / container.clientHeight, 0.05, 100);
+camera.position.set(0, 0.95, 1.85);
 
 const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
 renderer.setSize(container.clientWidth, container.clientHeight);
@@ -19,7 +19,7 @@ container.appendChild(renderer.domElement);
 // 2. Controles Orbitales
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
-controls.target.set(0, 0.9, 0);
+controls.target.set(0, 0.92, 0);
 
 // 3. Iluminación Holográfica
 scene.add(new THREE.AmbientLight(0x88ccff, 1.4));
@@ -107,42 +107,48 @@ gltfLoader.load(
     scene.add(model);
     model.updateMatrixWorld(true);
 
-    // Calcular el centro real de la columna (bone_spine) para ubicar el pecho
-    const chestAnchor = new THREE.Vector3(0, 1.22, 0.03);
+    // Calcular centro exacto del tórax a partir de bone_spine
+    const chestAnchor = new THREE.Vector3(0, 1.25, 0.03);
     if (nodes.bone_spine.length > 0) {
       const spineBox = new THREE.Box3();
       nodes.bone_spine.forEach((m) => spineBox.expandByObject(m));
       const spineCenter = spineBox.getCenter(new THREE.Vector3());
       const spineSize = spineBox.getSize(new THREE.Vector3());
-      // Posicionar en la zona torácica de la columna y ligeramente hacia adelante (+Z)
       chestAnchor.set(
         spineCenter.x + 0.015,
-        spineCenter.y + spineSize.y * 0.14,
-        spineCenter.z + 0.035
+        spineCenter.y + spineSize.y * 0.16,
+        spineCenter.z + 0.032
       );
-      controls.target.set(spineCenter.x, 0.9, spineCenter.z);
+      controls.target.set(spineCenter.x, 0.92, spineCenter.z);
     }
 
-    // Reagrupar todas las piezas del corazón, normalizar su tamaño y fijarlo en el pecho
+    // Reagrupar piezas del corazón, centrar en (0,0,0), escalar y fijar en chestAnchor
     if (nodes.heart.length > 0) {
       const rawHeartGroup = new THREE.Group();
       nodes.heart.forEach((mesh) => {
         mesh.visible = true;
         rawHeartGroup.attach(mesh);
       });
+      rawHeartGroup.updateMatrixWorld(true);
 
       const hBox = new THREE.Box3().setFromObject(rawHeartGroup);
       const hSize = hBox.getSize(new THREE.Vector3());
       const hCenter = hBox.getCenter(new THREE.Vector3());
       const maxHeartDim = Math.max(hSize.x, hSize.y, hSize.z);
 
-      const heartScale = 0.095 / maxHeartDim;
-      rawHeartGroup.scale.multiplyScalar(heartScale);
-      rawHeartGroup.position.sub(hCenter.multiplyScalar(heartScale));
+      // 1) Centrar el corazón exactamente en el origen local (0,0,0)
+      const heartCenterer = new THREE.Group();
+      rawHeartGroup.position.copy(hCenter).negate();
+      heartCenterer.add(rawHeartGroup);
 
+      // 2) Escalar alrededor de ese centro exacto para que mida 0.095 unidades
+      const heartScale = 0.095 / maxHeartDim;
+      heartCenterer.scale.setScalar(heartScale);
+
+      // 3) Colocar en el pecho y animar el latido desde ahí
       heartPivot = new THREE.Group();
       heartPivot.position.copy(chestAnchor);
-      heartPivot.add(rawHeartGroup);
+      heartPivot.add(heartCenterer);
       scene.add(heartPivot);
     }
 
