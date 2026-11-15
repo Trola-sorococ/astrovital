@@ -1,0 +1,23 @@
+{
+  "generated": "2026-11-14",
+  "mission_day": 112,
+  "radiation_uSv_h": 28,
+  "cabin_co2_mmHg": 3.8,
+  "solar_flares_30d": [],
+  "sources": [
+    "https://api.nasa.gov/DONKI/FLR",
+    "https://visualization.osdr.nasa.gov/biodata/api/",
+    "https://visualization.osdr.nasa.gov/biodata/api/v2/query/assays/?study.characteristics.organism=mus%20musculus&format=json",
+    "https://osdr.nasa.gov/bio/repo/data/studies/OSD-980",
+    "https://osdr.nasa.gov/bio/repo/data/studies/OSD-781",
+    "https://visualization.osdr.nasa.gov/radlab/api/",
+    "https://visualization.osdr.nasa.gov/eda/"
+  ],
+  "_quality": {
+    "mission_day": "Provisional example from the team's contract; replace with mission elapsed day.",
+    "radiation_uSv_h": "Provisional example from the contract. RadLab measured absorbed dose in µGy/h and was not converted to µSv/h.",
+    "cabin_co2_mmHg": "Provisional example from the contract; no EDA CSV has been imported yet.",
+    "solar_flares_30d": "Unavailable: DONKI returned HTTP 404. Empty list does not mean zero events.",
+    "osdr": "Metadata API query returned HTTP 400; linked NASA study pages are curated references."
+  }
+}
