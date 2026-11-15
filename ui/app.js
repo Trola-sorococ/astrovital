@@ -8,8 +8,8 @@ const statusEl = document.getElementById('connection-status');
 
 // 1. Escena, Cámara y Renderizador
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(40, container.clientWidth / container.clientHeight, 0.05, 100);
-camera.position.set(0, 0.95, 2.35);
+const camera = new THREE.PerspectiveCamera(38, container.clientWidth / container.clientHeight, 0.05, 100);
+camera.position.set(0, 0.95, 2.1);
 
 const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
 renderer.setSize(container.clientWidth, container.clientHeight);
@@ -92,28 +92,43 @@ gltfLoader.load(
     const model = gltf.scene;
     assignNodeMaterials(model);
 
-    // Ocultar piezas del corazón mientras encuadramos el cuerpo principal
+    // Ocultar corazón mientras calculamos la caja exacta del cuerpo
     nodes.heart.forEach((m) => (m.visible = false));
 
     const bodyBox = new THREE.Box3().setFromObject(model);
     const bodySize = bodyBox.getSize(new THREE.Vector3());
     const bodyCenter = bodyBox.getCenter(new THREE.Vector3());
     const maxDim = Math.max(bodySize.x, bodySize.y, bodySize.z);
-    const scale = 1.85 / maxDim;
+    const scale = 1.9 / maxDim;
 
     model.scale.setScalar(scale);
     model.position.sub(bodyCenter.multiplyScalar(scale));
     model.position.y += 0.9;
     scene.add(model);
+    model.updateMatrixWorld(true);
+
+    // Calcular el centro real de la columna (bone_spine) para ubicar el pecho
+    const chestAnchor = new THREE.Vector3(0, 1.22, 0.03);
+    if (nodes.bone_spine.length > 0) {
+      const spineBox = new THREE.Box3();
+      nodes.bone_spine.forEach((m) => spineBox.expandByObject(m));
+      const spineCenter = spineBox.getCenter(new THREE.Vector3());
+      const spineSize = spineBox.getSize(new THREE.Vector3());
+      // Posicionar en la zona torácica de la columna y ligeramente hacia adelante (+Z)
+      chestAnchor.set(
+        spineCenter.x + 0.015,
+        spineCenter.y + spineSize.y * 0.14,
+        spineCenter.z + 0.035
+      );
+      controls.target.set(spineCenter.x, 0.9, spineCenter.z);
+    }
 
     // Reagrupar todas las piezas del corazón, normalizar su tamaño y fijarlo en el pecho
     if (nodes.heart.length > 0) {
-      model.updateMatrixWorld(true);
       const rawHeartGroup = new THREE.Group();
-
       nodes.heart.forEach((mesh) => {
         mesh.visible = true;
-        rawHeartGroup.attach(mesh); // Conserva su transformación mundial exacta
+        rawHeartGroup.attach(mesh);
       });
 
       const hBox = new THREE.Box3().setFromObject(rawHeartGroup);
@@ -121,14 +136,12 @@ gltfLoader.load(
       const hCenter = hBox.getCenter(new THREE.Vector3());
       const maxHeartDim = Math.max(hSize.x, hSize.y, hSize.z);
 
-      // Escalar el corazón para que mida 0.13 unidades (proporción anatómica real)
-      const heartScale = 0.13 / maxHeartDim;
+      const heartScale = 0.095 / maxHeartDim;
       rawHeartGroup.scale.multiplyScalar(heartScale);
       rawHeartGroup.position.sub(hCenter.multiplyScalar(heartScale));
 
-      // Pivote limpio ubicado exactamente en la cavidad torácica izquierda
       heartPivot = new THREE.Group();
-      heartPivot.position.set(-0.035, 1.24, 0.035);
+      heartPivot.position.copy(chestAnchor);
       heartPivot.add(rawHeartGroup);
       scene.add(heartPivot);
     }
