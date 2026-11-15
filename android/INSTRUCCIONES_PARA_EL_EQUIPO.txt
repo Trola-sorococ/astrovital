@@ -1,0 +1,17 @@
+ENTREGA ANDROID - ASTROVITAL (versión 0.7.0)
+
+Proyecto Android nativo en Kotlin con fuentes, Gradle Wrapper y APK actualizado. La aplicación se muestra en el teléfono como Astrovital y usa el logotipo de pulso proporcionado.
+
+Al guardar correctamente el perfil (nombre y edad válidos), la app lo almacena en el teléfono, cierra el formulario y vuelve a Inicio con una confirmación breve.
+
+Incluye escenarios de demostración para escaneos: órbita nominal, EVA, microgravedad prolongada, evento solar, exposición a radiación, aumento de CO2 en cabina, descanso insuficiente, tormenta solar, fuga de CO2, fatiga, erupciones solares y clima espacial, biología del vuelo espacial, dosimetría de radiación y telemetría de cabina ISS.
+
+Al guardar un escaneo, la app envía una notificación local de confirmación. Si los signos de demostración salen de los rangos configurados, envía una alerta con una recomendación. Las simulaciones de fuga de CO2 y fatiga/descanso insuficiente también avisan que son ejercicios y recomiendan revisar ventilación o descansar. Al guardar un registro de ánimo, Mal, Cansado o una nota con síntomas de alerta genera una recomendación; Muy bien y Bien generan una confirmación de estado normal. La nota privada no se incluye en la notificación. Android puede pedir permiso para notificaciones al guardar el primer registro.
+
+Las zonas rojas son referencias de atención educativa del escenario, no lesiones confirmadas ni dosis personales. Los signos del escaneo son demostrativos, no mediciones clínicas. Los eventos solares no indican dosis recibida por la tripulación. El proyecto no tiene conexión validada a sensores en vivo de la cabina ISS; DosTel y OSDR aportan referencias históricas/curatoriales.
+
+Para abrir: Android Studio > Open > seleccionar la carpeta raíz que contiene settings.gradle.kts.
+
+Si se integra al repositorio AstroVital web, agregar el proyecto dentro de una carpeta independiente (por ejemplo android/) sin reemplazar los archivos web.
+
+El paquete omite local.properties y carpetas generadas/cachés; Android Studio las vuelve a crear al abrirlo.
