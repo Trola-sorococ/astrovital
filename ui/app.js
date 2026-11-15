@@ -92,7 +92,7 @@ gltfLoader.load(
     const model = gltf.scene;
     assignNodeMaterials(model);
 
-    // Ocultar corazón mientras calculamos la caja exacta del cuerpo
+    // Ocultar corazón mientras encuadramos el cuerpo
     nodes.heart.forEach((m) => (m.visible = false));
 
     const bodyBox = new THREE.Box3().setFromObject(model);
@@ -107,49 +107,46 @@ gltfLoader.load(
     scene.add(model);
     model.updateMatrixWorld(true);
 
-    // Calcular centro exacto del tórax a partir de bone_spine
-    const chestAnchor = new THREE.Vector3(0, 1.25, 0.03);
-    if (nodes.bone_spine.length > 0) {
-      const spineBox = new THREE.Box3();
-      nodes.bone_spine.forEach((m) => spineBox.expandByObject(m));
-      const spineCenter = spineBox.getCenter(new THREE.Vector3());
-      const spineSize = spineBox.getSize(new THREE.Vector3());
-      chestAnchor.set(
-        spineCenter.x + 0.015,
-        spineCenter.y + spineSize.y * 0.16,
-        spineCenter.z + 0.032
-      );
-      controls.target.set(spineCenter.x, 0.92, spineCenter.z);
-    }
+    // Calcular centro real del cuerpo (usando body o bone_spine)
+    const fullBox = new THREE.Box3().setFromObject(model);
+    const fullCenter = fullBox.getCenter(new THREE.Vector3());
+    const fullSize = fullBox.getSize(new THREE.Vector3());
 
-    // Reagrupar piezas del corazón, centrar en (0,0,0), escalar y fijar en chestAnchor
+    const chestAnchor = new THREE.Vector3(
+      fullCenter.x + 0.018,
+      fullBox.min.y + fullSize.y * 0.72,
+      fullCenter.z + 0.025
+    );
+    controls.target.set(fullCenter.x, fullBox.min.y + fullSize.y * 0.5, fullCenter.z);
+
+    // Reagrupar piezas del corazón y centrar sus vértices directamente en (0,0,0)
     if (nodes.heart.length > 0) {
-      const rawHeartGroup = new THREE.Group();
+      heartPivot = new THREE.Group();
+      heartPivot.position.copy(chestAnchor);
+      scene.add(heartPivot);
+
       nodes.heart.forEach((mesh) => {
         mesh.visible = true;
-        rawHeartGroup.attach(mesh);
+        heartPivot.attach(mesh);
       });
-      rawHeartGroup.updateMatrixWorld(true);
+      heartPivot.updateMatrixWorld(true);
 
-      const hBox = new THREE.Box3().setFromObject(rawHeartGroup);
+      // Medir en coordenadas mundiales ya dentro de heartPivot
+      const hBox = new THREE.Box3().setFromObject(heartPivot);
       const hSize = hBox.getSize(new THREE.Vector3());
       const hCenter = hBox.getCenter(new THREE.Vector3());
       const maxHeartDim = Math.max(hSize.x, hSize.y, hSize.z);
 
-      // 1) Centrar el corazón exactamente en el origen local (0,0,0)
-      const heartCenterer = new THREE.Group();
-      rawHeartGroup.position.copy(hCenter).negate();
-      heartCenterer.add(rawHeartGroup);
+      // Mover cada malla para que el centro geométrico coincida con chestAnchor
+      const offset = hCenter.clone().sub(chestAnchor);
+      nodes.heart.forEach((mesh) => {
+        mesh.position.sub(offset);
+      });
 
-      // 2) Escalar alrededor de ese centro exacto para que mida 0.095 unidades
-      const heartScale = 0.095 / maxHeartDim;
-      heartCenterer.scale.setScalar(heartScale);
-
-      // 3) Colocar en el pecho y animar el latido desde ahí
-      heartPivot = new THREE.Group();
-      heartPivot.position.copy(chestAnchor);
-      heartPivot.add(heartCenterer);
-      scene.add(heartPivot);
+      // Escalar alrededor del centro exacto del pecho
+      const heartScale = 0.085 / maxHeartDim;
+      heartPivot.userData.baseScale = heartScale;
+      heartPivot.scale.setScalar(heartScale);
     }
 
     statusEl.textContent = 'Modelo 3D Activo • Simulación en vivo';
@@ -229,7 +226,7 @@ document.getElementById('btn-critical').addEventListener('click', () => {
   updateSimulation();
 });
 
-// 7. Animación de latido desde el pivote centrado en el pecho
+// 7. Animación de latido manteniendo la escala normalizada
 const clock = new THREE.Clock();
 function animate() {
   requestAnimationFrame(animate);
@@ -238,7 +235,8 @@ function animate() {
   const pulse = 1 + Math.sin(t * (bpm / 60) * Math.PI * 2) * 0.08;
 
   if (heartPivot) {
-    heartPivot.scale.setScalar(pulse);
+    const base = heartPivot.userData.baseScale || 1;
+    heartPivot.scale.setScalar(base * pulse);
   }
 
   controls.update();
