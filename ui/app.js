@@ -21,12 +21,12 @@ const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 controls.target.set(0, 0.92, 0);
 
-// 3. Iluminación Holográfica
-scene.add(new THREE.AmbientLight(0x88ccff, 1.4));
-const dirLight = new THREE.DirectionalLight(0xffffff, 2.2);
+// 3. Iluminación estilo Escáner Biomédico
+scene.add(new THREE.AmbientLight(0xaad4ff, 1.4));
+const dirLight = new THREE.DirectionalLight(0xffffff, 2.0);
 dirLight.position.set(2, 4, 3);
 scene.add(dirLight);
-const rimLight = new THREE.DirectionalLight(0x00f0ff, 1.5);
+const rimLight = new THREE.DirectionalLight(0x00e699, 1.2);
 rimLight.position.set(-2, 2, -3);
 scene.add(rimLight);
 
@@ -61,30 +61,34 @@ function assignNodeMaterials(root) {
     if (matchedKey === 'body') {
       obj.renderOrder = 1;
       obj.material = new THREE.MeshStandardMaterial({
-        color: 0x00e5ff,
+        color: 0x00e699,
         transparent: true,
-        opacity: 0.10,
-        roughness: 0.2,
+        opacity: 0.14,
+        roughness: 0.25,
         depthWrite: false
       });
     } else if (matchedKey === 'heart') {
       obj.renderOrder = 3;
       obj.material = new THREE.MeshStandardMaterial({
-        color: 0xff3355,
-        emissive: 0xff3355,
-        emissiveIntensity: 1.1,
+        color: 0x00e699,
+        emissive: 0x00e699,
+        emissiveIntensity: 0.95,
         roughness: 0.3,
         depthTest: false
       });
     } else {
       obj.renderOrder = 2;
       obj.material = new THREE.MeshStandardMaterial({
-        color: 0xd8e8ff,
+        color: 0xd8f3ea,
         emissive: 0x000000,
-        emissiveIntensity: 0.65,
+        emissiveIntensity: 0.55,
         roughness: 0.35
       });
     }
+
+    nodes[matchedKey].push(obj);
+  });
+}
 
 // 5. Cargar modelo_zerog_pulse.glb con DRACOLoader
 const dracoLoader = new DRACOLoader();
@@ -99,7 +103,6 @@ gltfLoader.load(
     const model = gltf.scene;
     assignNodeMaterials(model);
 
-    // Ocultar corazón mientras encuadramos el cuerpo
     nodes.heart.forEach((m) => (m.visible = false));
 
     const bodyBox = new THREE.Box3().setFromObject(model);
@@ -114,7 +117,6 @@ gltfLoader.load(
     scene.add(model);
     model.updateMatrixWorld(true);
 
-    // Calcular centro real del cuerpo (usando body o bone_spine)
     const fullBox = new THREE.Box3().setFromObject(model);
     const fullCenter = fullBox.getCenter(new THREE.Vector3());
     const fullSize = fullBox.getSize(new THREE.Vector3());
@@ -126,7 +128,6 @@ gltfLoader.load(
     );
     controls.target.set(fullCenter.x, fullBox.min.y + fullSize.y * 0.5, fullCenter.z);
 
-    // Reagrupar piezas del corazón y centrar sus vértices directamente en (0,0,0)
     if (nodes.heart.length > 0) {
       heartPivot = new THREE.Group();
       heartPivot.position.copy(chestAnchor);
@@ -138,43 +139,40 @@ gltfLoader.load(
       });
       heartPivot.updateMatrixWorld(true);
 
-      // Medir en coordenadas mundiales ya dentro de heartPivot
       const hBox = new THREE.Box3().setFromObject(heartPivot);
       const hSize = hBox.getSize(new THREE.Vector3());
       const hCenter = hBox.getCenter(new THREE.Vector3());
       const maxHeartDim = Math.max(hSize.x, hSize.y, hSize.z);
 
-      // Mover cada malla para que el centro geométrico coincida con chestAnchor
       const offset = hCenter.clone().sub(chestAnchor);
       nodes.heart.forEach((mesh) => {
         mesh.position.sub(offset);
       });
 
-      // Escalar alrededor del centro exacto del pecho
       const heartScale = 0.085 / maxHeartDim;
       heartPivot.userData.baseScale = heartScale;
       heartPivot.scale.setScalar(heartScale);
     }
 
-    statusEl.textContent = 'Modelo 3D Activo • Simulación en vivo';
+    statusEl.textContent = 'Modelo listo · En línea';
     updateSimulation();
   },
   undefined,
   (error) => {
     console.error('Error cargando GLB:', error);
-    statusEl.textContent = 'Error al cargar modelo_zerog_pulse.glb';
+    statusEl.textContent = 'Error cargando modelo 3D';
   }
 );
 
-// 6. Lógica de Riesgo en Microgravedad y Colores Dinámicos
+// 6. Lógica de Riesgo y Colores Dinámicos
 const daysSlider = document.getElementById('days-slider');
 const bpmSlider = document.getElementById('bpm-slider');
 const exerciseSlider = document.getElementById('exercise-slider');
 
 function getRiskColor(score) {
-  if (score < 0.35) return { hex: 0x00ff88, label: 'Óptimo', css: '#00ff88' };
+  if (score < 0.35) return { hex: 0x00e699, label: 'Óptimo', css: '#00e699' };
   if (score < 0.70) return { hex: 0xffcc00, label: 'Moderado', css: '#ffcc00' };
-  return { hex: 0xff3355, label: 'Crítico', css: '#ff3355' };
+  return { hex: 0xff3b5c, label: 'Crítico', css: '#ff3b5c' };
 }
 
 function paintMeshes(meshList, colorHex) {
@@ -220,6 +218,7 @@ function updateSimulation() {
 
 [daysSlider, bpmSlider, exerciseSlider].forEach((el) => el.addEventListener('input', updateSimulation));
 
+// Presets
 document.getElementById('btn-nominal').addEventListener('click', () => {
   daysSlider.value = 30; bpmSlider.value = 72; exerciseSlider.value = 80;
   updateSimulation();
@@ -233,7 +232,19 @@ document.getElementById('btn-critical').addEventListener('click', () => {
   updateSimulation();
 });
 
-// 7. Animación de latido manteniendo la escala normalizada
+// Botón "Escanear y guardar resultados"
+document.getElementById('btn-scan').addEventListener('click', () => {
+  const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  const days = daysSlider.value;
+  const bpm = bpmSlider.value;
+  const heartLabel = document.getElementById('risk-heart').textContent;
+  const spineLabel = document.getElementById('risk-spine').textContent;
+
+  document.getElementById('scan-log').textContent =
+    `Escaneo guardado (${now}) · ${days}d en órbita · ${bpm} BPM · Corazón: ${heartLabel} · Óseo: ${spineLabel}`;
+});
+
+// 7. Animación de latido
 const clock = new THREE.Clock();
 function animate() {
   requestAnimationFrame(animate);
