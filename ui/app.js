@@ -8,8 +8,8 @@ const statusEl = document.getElementById('connection-status');
 
 // 1. Escena, Cámara y Renderizador
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 100);
-camera.position.set(0, 1.1, 2.8);
+const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.05, 100);
+camera.position.set(0, 1.0, 2.4);
 
 const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
 renderer.setSize(container.clientWidth, container.clientHeight);
@@ -41,17 +41,24 @@ const nodes = {
 };
 
 let heartGroup = null;
+let heartBaseScale = new THREE.Vector3(1, 1, 1);
 
 function assignNodeMaterials(root) {
   root.traverse((obj) => {
     if (!obj.isMesh) return;
 
-    // Buscar el nombre del nodo padre en la jerarquía
     let current = obj;
     let matchedKey = 'other';
     while (current) {
       const name = (current.name || '').toLowerCase();
-      if (name === 'heart') { matchedKey = 'heart'; heartGroup = current; break; }
+      if (name === 'heart') {
+        matchedKey = 'heart';
+        if (!heartGroup) {
+          heartGroup = current;
+          heartBaseScale.copy(current.scale);
+        }
+        break;
+      }
       if (name === 'bone_spine') { matchedKey = 'bone_spine'; break; }
       if (name === 'bone_left_femur') { matchedKey = 'bone_left_femur'; break; }
       if (name === 'bone_right_femur') { matchedKey = 'bone_right_femur'; break; }
@@ -63,7 +70,7 @@ function assignNodeMaterials(root) {
       obj.material = new THREE.MeshStandardMaterial({
         color: 0x00e5ff,
         transparent: true,
-        opacity: 0.18,
+        opacity: 0.22,
         roughness: 0.2,
         depthWrite: false
       });
@@ -71,7 +78,7 @@ function assignNodeMaterials(root) {
       obj.material = new THREE.MeshStandardMaterial({
         color: 0xd8e8ff,
         emissive: 0x000000,
-        emissiveIntensity: 0.35,
+        emissiveIntensity: 0.4,
         roughness: 0.4
       });
     }
@@ -91,21 +98,37 @@ gltfLoader.load(
   'assets/modelo_zerog_pulse.glb',
   (gltf) => {
     const model = gltf.scene;
+    assignNodeMaterials(model);
 
-    // Centrar y escalar automáticamente el modelo
+    // Ocultar temporalmente el corazón si quedó desproporcionado para encuadrar el cuerpo
+    if (heartGroup) heartGroup.visible = false;
+
     const box = new THREE.Box3().setFromObject(model);
     const size = box.getSize(new THREE.Vector3());
     const center = box.getCenter(new THREE.Vector3());
     const maxDim = Math.max(size.x, size.y, size.z);
-    const scale = 1.8 / maxDim;
+    const scale = 1.85 / maxDim;
 
     model.scale.setScalar(scale);
     model.position.sub(center.multiplyScalar(scale));
     model.position.y += 0.9;
 
-    assignNodeMaterials(model);
-    scene.add(model);
+    // Reubicar el corazón dentro del pecho y ajustar su escala al torso
+    if (heartGroup) {
+      heartGroup.visible = true;
+      const heartBox = new THREE.Box3().setFromObject(heartGroup);
+      const heartSize = heartBox.getSize(new THREE.Vector3());
+      const maxHeart = Math.max(heartSize.x, heartSize.y, heartSize.z);
+      if (maxHeart > 0.28) {
+        const fixRatio = 0.16 / maxHeart;
+        heartBaseScale.multiplyScalar(fixRatio);
+        heartGroup.scale.copy(heartBaseScale);
+      }
+      // Centrar en el pecho (ligeramente a la izquierda del esternón)
+      heartGroup.position.set(-0.04 / scale, 0.35 / scale, 0.03 / scale);
+    }
 
+    scene.add(model);
     statusEl.textContent = 'Modelo 3D Activo • Simulación en vivo';
     updateSimulation();
   },
@@ -143,7 +166,6 @@ function updateSimulation() {
   document.getElementById('bpm-val').textContent = `${bpm} BPM`;
   document.getElementById('exercise-val').textContent = `${Math.round(exercise * 100)}%`;
 
-  // Cálculo de desgaste óseo/muscular y estrés cardíaco
   const boneStress = Math.min(1, (days / 240) * (1.15 - exercise * 0.75));
   const muscleStress = Math.min(1, (days / 200) * (1.1 - exercise * 0.8));
   const heartStress = Math.min(1, Math.max(0, (bpm - 65) / 95));
@@ -171,7 +193,6 @@ function updateSimulation() {
 
 [daysSlider, bpmSlider, exerciseSlider].forEach((el) => el.addEventListener('input', updateSimulation));
 
-// Presets rápidos
 document.getElementById('btn-nominal').addEventListener('click', () => {
   daysSlider.value = 30; bpmSlider.value = 72; exerciseSlider.value = 80;
   updateSimulation();
@@ -185,16 +206,16 @@ document.getElementById('btn-critical').addEventListener('click', () => {
   updateSimulation();
 });
 
-// 7. Animación de latido y render loop
+// 7. Animación de latido respetando la escala original del corazón
 const clock = new THREE.Clock();
 function animate() {
   requestAnimationFrame(animate);
   const t = clock.getElapsedTime();
   const bpm = Number(bpmSlider.value);
-  const pulse = 1 + Math.sin(t * (bpm / 60) * Math.PI * 2) * 0.04;
+  const pulse = 1 + Math.sin(t * (bpm / 60) * Math.PI * 2) * 0.06;
 
   if (heartGroup) {
-    heartGroup.scale.setScalar(pulse);
+    heartGroup.scale.copy(heartBaseScale).multiplyScalar(pulse);
   }
 
   controls.update();
