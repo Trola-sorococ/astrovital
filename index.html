@@ -16,132 +16,289 @@
 </head>
 <body>
   <div class="app-shell">
-    <!-- Encabezado estilo Misión Aurora -->
+    <!-- Encabezado persistente estilo Órbita / Bienestar -->
     <header class="top-header">
-      <div class="brand-pill">
-        <span class="dot"></span>
-        <span>ÓRBITA / BIENESTAR</span>
-      </div>
-      <p class="mission-subtitle">CENTRO DE SALUD · MISIÓN AURORA</p>
-      <div class="greeting-row">
-        <div>
-          <h1>Hola, tripulante</h1>
-          <p class="lead-text">Resumen personal de bienestar y signos vitales.</p>
+      <div class="header-top-row">
+        <div class="brand-pill">
+          <span class="dot"></span>
+          <span>ÓRBITA / BIENESTAR</span>
         </div>
         <div id="connection-status" class="status-badge">Cargando modelo...</div>
       </div>
     </header>
 
-    <!-- Barra de seguimiento -->
-    <div class="mission-bar">
-      <span class="bar-icon">⊡</span>
-      <span>SEGUIMIENTO DE MISIÓN · ASTROVITAL</span>
-    </div>
-
-    <!-- Grid Principal -->
-    <main class="main-grid">
-      <!-- Tarjeta Izquierda: Visor 3D Tripulante -->
-      <section class="card viewer-card">
-        <div class="card-header">
-          <div>
-            <h2>Tripulante</h2>
-            <p class="card-sub">Modelo anatómico local · arrastra la figura para girarla</p>
-          </div>
-          <span class="tag-pill">ESCANEO 3D</span>
-        </div>
-
-        <div class="canvas-wrapper">
-          <div id="canvas-container"></div>
-        </div>
-
-        <p class="canvas-footer-note">Modelo anatómico listo · arrastra para girarlo</p>
-
-        <button type="button" id="btn-scan" class="primary-btn">
-          <span>✳</span> Escanear y guardar resultados
-        </button>
-      </section>
-
-      <!-- Columna Derecha: Simulación y Estado Biomédico -->
-      <div class="right-column">
-        <!-- Tarjeta de Controles de Simulación -->
-        <section class="card">
-          <div class="card-header">
-            <div>
-              <h2>Telemetría simulada</h2>
-              <p class="card-sub">Ajusta parámetros orbitales para evaluar desgaste</p>
-            </div>
-            <span class="tag-pill">SIMULADOR</span>
-          </div>
-
-          <div class="sliders-list">
-            <div class="slider-item">
-              <div class="slider-labels">
-                <span>Días en órbita</span>
-                <strong id="days-val">45 días</strong>
-              </div>
-              <input type="range" id="days-slider" min="1" max="365" value="45" />
-            </div>
-
-            <div class="slider-item">
-              <div class="slider-labels">
-                <span>Ritmo cardíaco (BPM)</span>
-                <strong id="bpm-val">78 BPM</strong>
-              </div>
-              <input type="range" id="bpm-slider" min="50" max="175" value="78" />
-            </div>
-
-            <div class="slider-item">
-              <div class="slider-labels">
-                <span>Contramedidas / Ejercicio</span>
-                <strong id="exercise-val">60%</strong>
-              </div>
-              <input type="range" id="exercise-slider" min="0" max="100" value="60" />
-            </div>
-          </div>
-
-          <div class="preset-row">
-            <button type="button" id="btn-nominal" class="secondary-btn">Órbita nominal</button>
-            <button type="button" id="btn-eva" class="secondary-btn">Caminata EVA</button>
-            <button type="button" id="btn-critical" class="secondary-btn">Alerta crítica</button>
-          </div>
-        </section>
-
-        <!-- Tarjeta de Diagnóstico por Nodo -->
-        <section class="card">
-          <div class="card-header">
-            <div>
-              <h2>Estado anatómico</h2>
-              <p class="card-sub">Evaluación en tiempo real por sistema</p>
-            </div>
-            <span class="tag-pill">JSON LISTO</span>
-          </div>
-
-          <div id="metrics-grid" class="metrics-grid">
-            <div class="metric-box">
-              <span class="metric-name">Corazón (heart)</span>
-              <strong id="risk-heart" class="metric-status">Óptimo</strong>
-            </div>
-            <div class="metric-box">
-              <span class="metric-name">Columna (bone_spine)</span>
-              <strong id="risk-spine" class="metric-status">Óptimo</strong>
-            </div>
-            <div class="metric-box">
-              <span class="metric-name">Fémur Izq / Der</span>
-              <strong id="risk-femur" class="metric-status">Óptimo</strong>
-            </div>
-            <div class="metric-box">
-              <span class="metric-name">Masa muscular (body)</span>
-              <strong id="risk-body" class="metric-status">Óptimo</strong>
-            </div>
-          </div>
-
-          <div id="scan-log" class="scan-log">
-            Último escaneo: pendiente de registro manual.
-          </div>
-        </section>
+    <!-- ==================== VISTA 1: INICIO ==================== -->
+    <section id="view-inicio" class="tab-view active">
+      <p class="mission-subtitle">CENTRO DE SALUD · MISIÓN AURORA</p>
+      <div class="greeting-block">
+        <h1 id="greeting-title">Hola, tripulante</h1>
+        <p class="lead-text">Resumen personal de bienestar y signos vitales.</p>
       </div>
-    </main>
+
+      <div class="mission-bar">
+        <span class="bar-icon">⊡</span>
+        <span id="mission-bar-text">SEGUIMIENTO DE MISIÓN · 180 DÍAS PROGRAMADOS</span>
+      </div>
+
+      <div class="main-grid">
+        <!-- Tarjeta Izquierda: Visor 3D Tripulante -->
+        <article class="card viewer-card">
+          <div class="card-header">
+            <div>
+              <h2>Tripulante</h2>
+              <p class="card-sub">Modelo anatómico local · arrastra la figura para girarla</p>
+            </div>
+            <span class="tag-pill">ESCANEO 3D</span>
+          </div>
+
+          <div class="canvas-wrapper">
+            <div id="canvas-container"></div>
+          </div>
+
+          <p class="canvas-footer-note">Modelo anatómico listo · arrastra para girarlo</p>
+
+          <button type="button" id="btn-scan" class="primary-btn">
+            <span>✳</span> Escanear y guardar resultados
+          </button>
+        </article>
+
+        <!-- Columna Derecha: Simulación y Escenario -->
+        <div class="right-column">
+          <article class="card">
+            <div class="card-header">
+              <div>
+                <h2>Escenario y telemetría</h2>
+                <p class="card-sub">Configura etapa, situación orbital y parámetros</p>
+              </div>
+              <span class="tag-pill">SIMULADOR</span>
+            </div>
+
+            <div class="form-row-2">
+              <div class="field-group">
+                <label for="stage-select">Etapa de misión</label>
+                <select id="stage-select" class="dark-input">
+                  <option value="Durante la misión">Durante la misión</option>
+                  <option value="Antes del viaje">Antes del viaje</option>
+                </select>
+              </div>
+              <div class="field-group">
+                <label for="situation-select">Situación</label>
+                <select id="situation-select" class="dark-input">
+                  <option value="Órbita nominal">Órbita nominal</option>
+                  <option value="Exposición a radiación espacial">Exposición a radiación espacial</option>
+                  <option value="Aumento de CO₂ en cabina">Aumento de CO₂ en cabina</option>
+                  <option value="Evento o tormenta solar">Evento o tormenta solar</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="sliders-list">
+              <div class="slider-item">
+                <div class="slider-labels">
+                  <span>Días en órbita</span>
+                  <strong id="days-val">45 días</strong>
+                </div>
+                <input type="range" id="days-slider" min="1" max="365" value="45" />
+              </div>
+
+              <div class="slider-item">
+                <div class="slider-labels">
+                  <span>Frecuencia cardíaca (FC)</span>
+                  <strong id="bpm-val">78 lpm</strong>
+                </div>
+                <input type="range" id="bpm-slider" min="50" max="175" value="78" />
+              </div>
+
+              <div class="slider-item">
+                <div class="slider-labels">
+                  <span>Contramedidas / Ejercicio</span>
+                  <strong id="exercise-val">60%</strong>
+                </div>
+                <input type="range" id="exercise-slider" min="0" max="100" value="60" />
+              </div>
+            </div>
+
+            <div class="preset-row">
+              <button type="button" id="btn-nominal" class="secondary-btn">Órbita nominal</button>
+              <button type="button" id="btn-eva" class="secondary-btn">Radiación / EVA</button>
+              <button type="button" id="btn-critical" class="secondary-btn">Alerta crítica</button>
+            </div>
+          </article>
+
+          <article class="card">
+            <div class="card-header">
+              <div>
+                <h2>Zonas anatómicas</h2>
+                <p class="card-sub">Diagnóstico visual en tiempo real</p>
+              </div>
+              <span class="tag-pill">JSON LISTO</span>
+            </div>
+
+            <div id="metrics-grid" class="metrics-grid">
+              <div class="metric-box">
+                <span class="metric-name">Corazón y vasos</span>
+                <strong id="risk-heart" class="metric-status">Óptimo</strong>
+              </div>
+              <div class="metric-box">
+                <span class="metric-name">Columna (bone_spine)</span>
+                <strong id="risk-spine" class="metric-status">Óptimo</strong>
+              </div>
+              <div class="metric-box">
+                <span class="metric-name">Fémur Izq / Der</span>
+                <strong id="risk-femur" class="metric-status">Óptimo</strong>
+              </div>
+              <div class="metric-box">
+                <span class="metric-name">Masa muscular (body)</span>
+                <strong id="risk-body" class="metric-status">Óptimo</strong>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== VISTA 2: SIGNOS ==================== -->
+    <section id="view-signos" class="tab-view">
+      <div class="greeting-block">
+        <h1>Seguimiento de misión</h1>
+        <p class="lead-text">Signos vitales de demostración · cambian cada 4 segundos</p>
+      </div>
+
+      <article class="card notice-card">
+        <span class="notice-title">LECTURAS SIMULADAS</span>
+        <p class="card-sub">Sirven para revisar la interfaz y el flujo de seguimiento. No son mediciones de una persona.</p>
+        <p class="notice-time">Actualización: <strong id="vital-timestamp">--:--:--</strong></p>
+      </article>
+
+      <div class="vitals-stack">
+        <article class="card vital-card">
+          <span class="vital-label">Frecuencia cardíaca</span>
+          <div id="vital-hr" class="vital-value">78 lpm</div>
+          <span class="vital-note">Ejemplo variable no clínico</span>
+        </article>
+
+        <article class="card vital-card">
+          <span class="vital-label">Oxígeno en sangre</span>
+          <div id="vital-spo2" class="vital-value">98 %</div>
+          <span class="vital-note">Ejemplo variable no clínico</span>
+        </article>
+
+        <article class="card vital-card">
+          <span class="vital-label">Temperatura corporal</span>
+          <div id="vital-temp" class="vital-value">36.7 °C</div>
+          <span class="vital-note">Ejemplo variable no clínico</span>
+        </article>
+
+        <article class="card vital-card">
+          <span class="vital-label">Sueño</span>
+          <div id="vital-sleep" class="vital-value">7.2 h</div>
+          <span class="vital-note">Ejemplo variable no clínico</span>
+        </article>
+
+        <article class="card vital-card">
+          <span class="vital-label">Estrés</span>
+          <div id="vital-stress" class="vital-value">24 /100</div>
+          <span class="vital-note">Ejemplo variable no clínico</span>
+        </article>
+      </div>
+    </section>
+
+    <!-- ==================== VISTA 3: HISTORIAL ==================== -->
+    <section id="view-historial" class="tab-view">
+      <div class="greeting-row">
+        <div>
+          <h1>Historial</h1>
+          <p class="lead-text">Escaneos guardados por etapa · solo en este dispositivo</p>
+        </div>
+        <button type="button" id="btn-clear-history" class="secondary-btn">Limpiar historial</button>
+      </div>
+
+      <div id="history-list" class="history-list"></div>
+    </section>
+
+    <!-- ==================== VISTA 4: PERFIL ==================== -->
+    <section id="view-perfil" class="tab-view">
+      <div class="greeting-block">
+        <h1>Perfil del tripulante</h1>
+        <p class="lead-text">Información básica para personalizar el seguimiento. Se guarda solo en este dispositivo.</p>
+      </div>
+
+      <form id="profile-form" class="card profile-form">
+        <div class="field-group">
+          <label for="prof-name">Nombre</label>
+          <input type="text" id="prof-name" class="dark-input" placeholder="Ej. Alex Rivera" />
+        </div>
+
+        <div class="form-row-2">
+          <div class="field-group">
+            <label for="prof-age">Edad</label>
+            <input type="number" id="prof-age" class="dark-input" placeholder="Años" />
+          </div>
+          <div class="field-group">
+            <label for="prof-blood">Tipo de sangre</label>
+            <input type="text" id="prof-blood" class="dark-input" placeholder="Ej. O+" />
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label for="prof-allergies">Alergias</label>
+          <input type="text" id="prof-allergies" class="dark-input" placeholder="Indica alergias conocidas" />
+        </div>
+
+        <div class="field-group">
+          <label for="prof-conditions">Condiciones</label>
+          <input type="text" id="prof-conditions" class="dark-input" placeholder="Información que el equipo de salud deba conocer" />
+        </div>
+
+        <div class="form-row-2">
+          <div class="field-group">
+            <label for="prof-contact">Contacto</label>
+            <input type="text" id="prof-contact" class="dark-input" placeholder="Nombre y teléfono" />
+          </div>
+          <div class="field-group">
+            <label for="prof-duration">Duración total de misión (días)</label>
+            <input type="number" id="prof-duration" class="dark-input" placeholder="Ej. 180 días en total" />
+          </div>
+        </div>
+
+        <button type="submit" class="primary-btn">Guardar perfil en este dispositivo</button>
+        <p id="profile-feedback" class="disclaimer-text">Los datos del perfil son informativos y no sustituyen una evaluación clínica.</p>
+      </form>
+    </section>
   </div>
+
+  <!-- Barra de Navegación Inferior fija (igual a la APK) -->
+  <nav class="bottom-nav" aria-label="Navegación principal">
+    <button type="button" class="nav-btn active" data-target="view-inicio">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8">
+        <path d="M3 10.5L12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1v-9.5z"/>
+      </svg>
+      <span>Inicio</span>
+    </button>
+
+    <button type="button" class="nav-btn" data-target="view-signos">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8">
+        <path d="M12 21s-7-4.5-9.5-9A5.5 5.5 0 0 1 12 6.5 5.5 5.5 0 0 1 21.5 12c-2.5 4.5-9.5 9-9.5 9z"/>
+      </svg>
+      <span>Signos</span>
+    </button>
+
+    <button type="button" class="nav-btn" data-target="view-historial">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8">
+        <rect x="4" y="4" width="16" height="16" rx="2"/>
+        <path d="M8 9h8M8 13h8M8 17h5"/>
+      </svg>
+      <span>Historial</span>
+    </button>
+
+    <button type="button" class="nav-btn" data-target="view-perfil">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8">
+        <circle cx="12" cy="8" r="4"/>
+        <path d="M5 20a7 7 0 0 1 14 0"/>
+      </svg>
+      <span>Perfil</span>
+    </button>
+  </nav>
 
   <script type="module" src="ui/app.js"></script>
 </body>
