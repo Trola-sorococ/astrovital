@@ -1,41 +1,81 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AstroVital | ZeroG-Pulse</title>
-    <link rel="stylesheet" href="ui/styles.css">
-    <script src="ui/app.js" defer></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AstroVital | ZeroG-Pulse HUD 3D</title>
+  <link rel="stylesheet" href="ui/styles.css" />
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.170.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.170.0/examples/jsm/"
+      }
+    }
+  </script>
 </head>
-
 <body>
-    <header>
-        <h1>AstroVital</h1>
-        <p>Sistema de monitoreo biomédico - Equipo ZeroG-Pulse</p>
-    </header>
+  <header class="hud-header">
+    <div>
+      <h1>ASTROVITAL <span class="badge">HUD 3D</span></h1>
+      <p>Simulación Biomédica en Microgravedad — Equipo ZeroG-Pulse</p>
+    </div>
+    <div id="connection-status" class="status-pill">Cargando modelo 3D...</div>
+  </header>
 
-    <main id="app">
-        <section id="status-panel">
-            <h2>Estado del Sistema</h2>
-            <p id="connection-status">Esperando datos de sensores...</p>
-        </section>
+  <main class="hud-layout">
+    <!-- Visor 3D -->
+    <section class="viewer-panel">
+      <div id="canvas-container"></div>
+      <div class="viewer-hint">Arrastra para rotar • Rueda/Pellizco para zoom</div>
+    </section>
 
-        <section id="metrics-grid">
-            <div class="card">
-                <h3>Frecuencia Cardíaca</h3>
-                <p id="bpm-value">-- BPM</p>
-            </div>
-            <div class="card">
-                <h3>Oxigenación (SpO2)</h3>
-                <p id="spo2-value">-- %</p>
-            </div>
-            <div class="card">
-                <h3>Temperatura</h3>
-                <p id="temp-value">-- °C</p>
-            </div>
-        </section>
-    </main>
+    <!-- Panel de Simulación y Telemetría -->
+    <aside class="controls-panel">
+      <h2>Simulador de Microgravedad</h2>
+
+      <div class="control-group">
+        <label for="days-slider">Días en órbita: <strong id="days-val">45 días</strong></label>
+        <input type="range" id="days-slider" min="1" max="365" value="45" />
+      </div>
+
+      <div class="control-group">
+        <label for="bpm-slider">Ritmo Cardíaco (BPM): <strong id="bpm-val">78 BPM</strong></label>
+        <input type="range" id="bpm-slider" min="50" max="175" value="78" />
+      </div>
+
+      <div class="control-group">
+        <label for="exercise-slider">Contramedidas / Ejercicio diario: <strong id="exercise-val">60%</strong></label>
+        <input type="range" id="exercise-slider" min="0" max="100" value="60" />
+      </div>
+
+      <div class="presets">
+        <button type="button" id="btn-nominal">Órbita Nominal</button>
+        <button type="button" id="btn-eva">Caminata EVA</button>
+        <button type="button" id="btn-critical">Alerta Crítica</button>
+      </div>
+
+      <div id="metrics-grid" class="metrics-grid">
+        <div class="metric-card">
+          <span>Corazón (heart)</span>
+          <strong id="risk-heart">Óptimo</strong>
+        </div>
+        <div class="metric-card">
+          <span>Columna (bone_spine)</span>
+          <strong id="risk-spine">Leve</strong>
+        </div>
+        <div class="metric-card">
+          <span>Fémur Izq/Der</span>
+          <strong id="risk-femur">Leve</strong>
+        </div>
+        <div class="metric-card">
+          <span>Masa Muscular (body)</span>
+          <strong id="risk-body">Estable</strong>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <script type="module" src="ui/app.js"></script>
 </body>
-
 </html>
