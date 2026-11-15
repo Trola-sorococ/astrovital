@@ -3,10 +3,29 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 
+// ==================== 1. NAVEGACIÓN ENTRE PESTAÑAS ====================
+const navButtons = document.querySelectorAll('.nav-btn');
+const tabViews = document.querySelectorAll('.tab-view');
+
+navButtons.forEach((btn) => {
+  btn.addEventListener('click', () => {
+    const targetId = btn.dataset.target;
+    navButtons.forEach((b) => b.classList.remove('active'));
+    tabViews.forEach((v) => v.classList.remove('active'));
+
+    btn.classList.add('active');
+    document.getElementById(targetId).classList.add('active');
+
+    if (targetId === 'view-inicio') {
+      resizeViewer();
+    }
+  });
+});
+
+// ==================== 2. VISOR 3D THREE.JS ====================
 const container = document.getElementById('canvas-container');
 const statusEl = document.getElementById('connection-status');
 
-// 1. Escena, Cámara y Renderizador
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(36, container.clientWidth / container.clientHeight, 0.05, 100);
 camera.position.set(0, 0.95, 1.85);
@@ -16,12 +35,10 @@ renderer.setSize(container.clientWidth, container.clientHeight);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 container.appendChild(renderer.domElement);
 
-// 2. Controles Orbitales
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 controls.target.set(0, 0.92, 0);
 
-// 3. Iluminación estilo Escáner Biomédico
 scene.add(new THREE.AmbientLight(0xaad4ff, 1.4));
 const dirLight = new THREE.DirectionalLight(0xffffff, 2.0);
 dirLight.position.set(2, 4, 3);
@@ -30,7 +47,6 @@ const rimLight = new THREE.DirectionalLight(0x00e699, 1.2);
 rimLight.position.set(-2, 2, -3);
 scene.add(rimLight);
 
-// 4. Referencias a los nodos del modelo
 const nodes = {
   body: [],
   heart: [],
@@ -90,7 +106,6 @@ function assignNodeMaterials(root) {
   });
 }
 
-// 5. Cargar modelo_zerog_pulse.glb con DRACOLoader
 const dracoLoader = new DRACOLoader();
 dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.7/');
 
@@ -164,15 +179,24 @@ gltfLoader.load(
   }
 );
 
-// 6. Lógica de Riesgo y Colores Dinámicos
+// ==================== 3. SIMULACIÓN Y DIAGNÓSTICO ====================
 const daysSlider = document.getElementById('days-slider');
 const bpmSlider = document.getElementById('bpm-slider');
 const exerciseSlider = document.getElementById('exercise-slider');
+const stageSelect = document.getElementById('stage-select');
+const situationSelect = document.getElementById('situation-select');
+
+let currentTelemetry = {
+  bpm: 78,
+  spo2: 98,
+  temp: 36.7,
+  markedZones: []
+};
 
 function getRiskColor(score) {
   if (score < 0.35) return { hex: 0x00e699, label: 'Óptimo', css: '#00e699' };
   if (score < 0.70) return { hex: 0xffcc00, label: 'Moderado', css: '#ffcc00' };
-  return { hex: 0xff3b5c, label: 'Crítico', css: '#ff3b5c' };
+  return { hex: 0xff453a, label: 'Crítico', css: '#ff453a' };
 }
 
 function paintMeshes(meshList, colorHex) {
@@ -186,14 +210,18 @@ function updateSimulation() {
   const days = Number(daysSlider.value);
   const bpm = Number(bpmSlider.value);
   const exercise = Number(exerciseSlider.value) / 100;
+  const situation = situationSelect.value;
 
   document.getElementById('days-val').textContent = `${days} días`;
-  document.getElementById('bpm-val').textContent = `${bpm} BPM`;
+  document.getElementById('bpm-val').textContent = `${bpm} lpm`;
   document.getElementById('exercise-val').textContent = `${Math.round(exercise * 100)}%`;
 
-  const boneStress = Math.min(1, (days / 240) * (1.15 - exercise * 0.75));
+  let radiationBoost = situation === 'Exposición a radiación espacial' ? 0.45 : 0;
+  let co2Boost = situation === 'Aumento de CO₂ en cabina' ? 0.3 : 0;
+
+  const boneStress = Math.min(1, (days / 240) * (1.15 - exercise * 0.75) + radiationBoost);
   const muscleStress = Math.min(1, (days / 200) * (1.1 - exercise * 0.8));
-  const heartStress = Math.min(1, Math.max(0, (bpm - 65) / 95));
+  const heartStress = Math.min(1, Math.max(0, (bpm - 65) / 95) + co2Boost + radiationBoost * 0.5);
 
   const heartState = getRiskColor(heartStress);
   const boneState = getRiskColor(boneStress);
@@ -214,37 +242,226 @@ function updateSimulation() {
   elSpine.textContent = boneState.label; elSpine.style.color = boneState.css;
   elFemur.textContent = boneState.label; elFemur.style.color = boneState.css;
   elBody.textContent = bodyState.label; elBody.style.color = bodyState.css;
+
+  const marked = [];
+  if (boneStress >= 0.35) marked.push('esqueleto (referencia visual a tejidos formadores de sangre)');
+  if (heartStress >= 0.35) marked.push('corazón y vasos (referencia visual)');
+  if (muscleStress >= 0.35) marked.push('masa muscular (referencia visual)');
+
+  currentTelemetry = {
+    bpm,
+    spo2: situation === 'Aumento de CO₂ en cabina' ? 94 : 98,
+    temp: +(36.6 + (bpm - 70) * 0.008).toFixed(2),
+    markedZones: marked
+  };
 }
 
-[daysSlider, bpmSlider, exerciseSlider].forEach((el) => el.addEventListener('input', updateSimulation));
+[daysSlider, bpmSlider, exerciseSlider, situationSelect].forEach((el) =>
+  el.addEventListener('input', updateSimulation)
+);
 
-// Presets
 document.getElementById('btn-nominal').addEventListener('click', () => {
+  stageSelect.value = 'Durante la misión';
+  situationSelect.value = 'Órbita nominal';
   daysSlider.value = 30; bpmSlider.value = 72; exerciseSlider.value = 80;
   updateSimulation();
 });
+
 document.getElementById('btn-eva').addEventListener('click', () => {
-  daysSlider.value = 120; bpmSlider.value = 138; exerciseSlider.value = 55;
+  stageSelect.value = 'Durante la misión';
+  situationSelect.value = 'Exposición a radiación espacial';
+  daysSlider.value = 120; bpmSlider.value = 115; exerciseSlider.value = 50;
   updateSimulation();
 });
+
 document.getElementById('btn-critical').addEventListener('click', () => {
-  daysSlider.value = 300; bpmSlider.value = 165; exerciseSlider.value = 10;
+  stageSelect.value = 'Durante la misión';
+  situationSelect.value = 'Exposición a radiación espacial';
+  daysSlider.value = 300; bpmSlider.value = 162; exerciseSlider.value = 10;
   updateSimulation();
 });
 
-// Botón "Escanear y guardar resultados"
-document.getElementById('btn-scan').addEventListener('click', () => {
-  const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-  const days = daysSlider.value;
-  const bpm = bpmSlider.value;
-  const heartLabel = document.getElementById('risk-heart').textContent;
-  const spineLabel = document.getElementById('risk-spine').textContent;
+// ==================== 4. PESTAÑA SIGNOS (ACTUALIZA CADA 4s) ====================
+function refreshLiveVitals() {
+  const now = new Date();
+  const timeStr = now.toTimeString().split(' ')[0];
+  const baseBpm = Number(bpmSlider.value);
+  const jitter = Math.floor(Math.random() * 5) - 2;
 
-  document.getElementById('scan-log').textContent =
-    `Escaneo guardado (${now}) · ${days}d en órbita · ${bpm} BPM · Corazón: ${heartLabel} · Óseo: ${spineLabel}`;
+  const hr = Math.max(52, baseBpm + jitter);
+  const spo2 = situationSelect.value === 'Aumento de CO₂ en cabina' ? 94 + (jitter > 0 ? 1 : 0) : 97 + (jitter > 0 ? 1 : 0);
+  const temp = (36.5 + Math.random() * 0.4).toFixed(1);
+  const sleep = (6.4 + Math.random() * 1.4).toFixed(1);
+  const stress = Math.min(95, Math.max(12, Math.round((hr - 55) * 0.85)));
+
+  document.getElementById('vital-timestamp').textContent = timeStr;
+  document.getElementById('vital-hr').textContent = `${hr} lpm`;
+  document.getElementById('vital-spo2').textContent = `${spo2} %`;
+  document.getElementById('vital-temp').textContent = `${temp} °C`;
+  document.getElementById('vital-sleep').textContent = `${sleep} h`;
+  document.getElementById('vital-stress').textContent = `${stress} /100`;
+}
+
+refreshLiveVitals();
+setInterval(refreshLiveVitals, 4000);
+
+// ==================== 5. PESTAÑA HISTORIAL (LOCALSTORAGE) ====================
+const HISTORY_KEY = 'astrovital_scan_history_v1';
+
+const defaultScans = [
+  {
+    title: 'Escaneo inicial · antes del viaje',
+    date: '15/11/2026 · 21:25 · Antes del viaje',
+    situation: 'Órbita nominal',
+    markedZones: [],
+    bpm: 65,
+    spo2: 98,
+    temp: 36.93
+  },
+  {
+    title: 'Escaneo durante la estancia',
+    date: '15/11/2026 · 21:17 · Durante la misión',
+    situation: 'Exposición a radiación espacial',
+    markedZones: [
+      'esqueleto (referencia visual a tejidos formadores de sangre)',
+      'corazón y vasos (referencia visual)',
+      'cerebro/SNC (referencia visual)'
+    ],
+    bpm: 79,
+    spo2: 97,
+    temp: 36.64
+  }
+];
+
+function loadHistory() {
+  try {
+    const raw = localStorage.getItem(HISTORY_KEY);
+    return raw ? JSON.parse(raw) : defaultScans;
+  } catch {
+    return defaultScans;
+  }
+}
+
+function renderHistory() {
+  const listEl = document.getElementById('history-list');
+  const scans = loadHistory();
+
+  if (scans.length === 0) {
+    listEl.innerHTML = `<div class="history-card"><p class="card-sub">No hay escaneos guardados aún. Usa "Escanear y guardar resultados" en Inicio.</p></div>`;
+    return;
+  }
+
+  listEl.innerHTML = scans
+    .map((item) => {
+      const hasAlerts = item.markedZones && item.markedZones.length > 0;
+      const statusHtml = hasAlerts
+        ? `<div class="history-status-alert">● Zonas marcadas: ${item.markedZones.join(', ')}</div>`
+        : `<div class="history-status-ok">● Estado estable · sin zonas marcadas</div>`;
+
+      return `
+        <article class="history-card">
+          <h3>${item.title}</h3>
+          <div class="history-meta">${item.date}</div>
+          <div class="history-situation">Situación: ${item.situation}</div>
+          ${statusHtml}
+          <div class="history-telemetry">FC ${item.bpm} lpm · SpO₂ ${item.spo2}% · Temp. ${item.temp} °C</div>
+        </article>
+      `;
+    })
+    .join('');
+}
+
+document.getElementById('btn-scan').addEventListener('click', () => {
+  const now = new Date();
+  const datePart = now.toLocaleDateString('es-GT');
+  const timePart = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  const stage = stageSelect.value;
+
+  const newEntry = {
+    title: stage === 'Antes del viaje' ? 'Escaneo inicial · antes del viaje' : 'Escaneo durante la estancia',
+    date: `${datePart} · ${timePart} · ${stage}`,
+    situation: situationSelect.value,
+    markedZones: [...currentTelemetry.markedZones],
+    bpm: currentTelemetry.bpm,
+    spo2: currentTelemetry.spo2,
+    temp: currentTelemetry.temp
+  };
+
+  const scans = loadHistory();
+  scans.unshift(newEntry);
+  localStorage.setItem(HISTORY_KEY, JSON.stringify(scans));
+  renderHistory();
+
+  const btn = document.getElementById('btn-scan');
+  btn.innerHTML = '<span>✓</span> Resultados guardados en Historial';
+  setTimeout(() => {
+    btn.innerHTML = '<span>✳</span> Escanear y guardar resultados';
+  }, 1800);
 });
 
-// 7. Animación de latido
+document.getElementById('btn-clear-history').addEventListener('click', () => {
+  localStorage.setItem(HISTORY_KEY, JSON.stringify([]));
+  renderHistory();
+});
+
+renderHistory();
+
+// ==================== 6. PESTAÑA PERFIL (LOCALSTORAGE) ====================
+const PROFILE_KEY = 'astrovital_crew_profile_v1';
+
+function applyProfileToUI(profile) {
+  const name = (profile.name || '').trim();
+  const duration = (profile.duration || '').trim();
+
+  document.getElementById('greeting-title').textContent = name ? `Hola, ${name}` : 'Hola, tripulante';
+  document.getElementById('mission-bar-text').textContent = duration
+    ? `SEGUIMIENTO DE MISIÓN · ${duration} DÍAS PROGRAMADOS`
+    : 'SEGUIMIENTO DE MISIÓN · ASTROVITAL';
+}
+
+function loadProfile() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(PROFILE_KEY) || '{}');
+    document.getElementById('prof-name').value = saved.name || '';
+    document.getElementById('prof-age').value = saved.age || '';
+    document.getElementById('prof-blood').value = saved.blood || '';
+    document.getElementById('prof-allergies').value = saved.allergies || '';
+    document.getElementById('prof-conditions').value = saved.conditions || '';
+    document.getElementById('prof-contact').value = saved.contact || '';
+    document.getElementById('prof-duration').value = saved.duration || '';
+    applyProfileToUI(saved);
+  } catch {
+    // Ignorar si está vacío
+  }
+}
+
+document.getElementById('profile-form').addEventListener('submit', (e) => {
+  e.preventDefault();
+  const profile = {
+    name: document.getElementById('prof-name').value,
+    age: document.getElementById('prof-age').value,
+    blood: document.getElementById('prof-blood').value,
+    allergies: document.getElementById('prof-allergies').value,
+    conditions: document.getElementById('prof-conditions').value,
+    contact: document.getElementById('prof-contact').value,
+    duration: document.getElementById('prof-duration').value
+  };
+
+  localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
+  applyProfileToUI(profile);
+
+  const fb = document.getElementById('profile-feedback');
+  fb.textContent = '✓ Perfil guardado en este dispositivo.';
+  fb.style.color = '#00e699';
+  setTimeout(() => {
+    fb.textContent = 'Los datos del perfil son informativos y no sustituyen una evaluación clínica.';
+    fb.style.color = '';
+  }, 2200);
+});
+
+loadProfile();
+
+// ==================== 7. RENDER LOOP Y RESIZE ====================
 const clock = new THREE.Clock();
 function animate() {
   requestAnimationFrame(animate);
@@ -262,8 +479,11 @@ function animate() {
 }
 animate();
 
-window.addEventListener('resize', () => {
+function resizeViewer() {
+  if (!container.clientWidth || !container.clientHeight) return;
   camera.aspect = container.clientWidth / container.clientHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(container.clientWidth, container.clientHeight);
-});
+}
+
+window.addEventListener('resize', resizeViewer);
