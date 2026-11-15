@@ -8,8 +8,8 @@ const statusEl = document.getElementById('connection-status');
 
 // 1. Escena, Cámara y Renderizador
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.05, 100);
-camera.position.set(0, 1.0, 2.4);
+const camera = new THREE.PerspectiveCamera(40, container.clientWidth / container.clientHeight, 0.05, 100);
+camera.position.set(0, 0.95, 2.35);
 
 const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
 renderer.setSize(container.clientWidth, container.clientHeight);
@@ -40,8 +40,7 @@ const nodes = {
   other: []
 };
 
-let heartGroup = null;
-let heartBaseScale = new THREE.Vector3(1, 1, 1);
+let heartPivot = null;
 
 function assignNodeMaterials(root) {
   root.traverse((obj) => {
@@ -51,14 +50,7 @@ function assignNodeMaterials(root) {
     let matchedKey = 'other';
     while (current) {
       const name = (current.name || '').toLowerCase();
-      if (name === 'heart') {
-        matchedKey = 'heart';
-        if (!heartGroup) {
-          heartGroup = current;
-          heartBaseScale.copy(current.scale);
-        }
-        break;
-      }
+      if (name.includes('heart')) { matchedKey = 'heart'; break; }
       if (name === 'bone_spine') { matchedKey = 'bone_spine'; break; }
       if (name === 'bone_left_femur') { matchedKey = 'bone_left_femur'; break; }
       if (name === 'bone_right_femur') { matchedKey = 'bone_right_femur'; break; }
@@ -78,8 +70,8 @@ function assignNodeMaterials(root) {
       obj.material = new THREE.MeshStandardMaterial({
         color: 0xd8e8ff,
         emissive: 0x000000,
-        emissiveIntensity: 0.4,
-        roughness: 0.4
+        emissiveIntensity: 0.45,
+        roughness: 0.35
       });
     }
 
@@ -100,35 +92,47 @@ gltfLoader.load(
     const model = gltf.scene;
     assignNodeMaterials(model);
 
-    // Ocultar temporalmente el corazón si quedó desproporcionado para encuadrar el cuerpo
-    if (heartGroup) heartGroup.visible = false;
+    // Ocultar piezas del corazón mientras encuadramos el cuerpo principal
+    nodes.heart.forEach((m) => (m.visible = false));
 
-    const box = new THREE.Box3().setFromObject(model);
-    const size = box.getSize(new THREE.Vector3());
-    const center = box.getCenter(new THREE.Vector3());
-    const maxDim = Math.max(size.x, size.y, size.z);
+    const bodyBox = new THREE.Box3().setFromObject(model);
+    const bodySize = bodyBox.getSize(new THREE.Vector3());
+    const bodyCenter = bodyBox.getCenter(new THREE.Vector3());
+    const maxDim = Math.max(bodySize.x, bodySize.y, bodySize.z);
     const scale = 1.85 / maxDim;
 
     model.scale.setScalar(scale);
-    model.position.sub(center.multiplyScalar(scale));
+    model.position.sub(bodyCenter.multiplyScalar(scale));
     model.position.y += 0.9;
+    scene.add(model);
 
-    // Reubicar el corazón dentro del pecho y ajustar su escala al torso
-    if (heartGroup) {
-      heartGroup.visible = true;
-      const heartBox = new THREE.Box3().setFromObject(heartGroup);
-      const heartSize = heartBox.getSize(new THREE.Vector3());
-      const maxHeart = Math.max(heartSize.x, heartSize.y, heartSize.z);
-      if (maxHeart > 0.28) {
-        const fixRatio = 0.16 / maxHeart;
-        heartBaseScale.multiplyScalar(fixRatio);
-        heartGroup.scale.copy(heartBaseScale);
-      }
-      // Centrar en el pecho (ligeramente a la izquierda del esternón)
-      heartGroup.position.set(-0.04 / scale, 0.35 / scale, 0.03 / scale);
+    // Reagrupar todas las piezas del corazón, normalizar su tamaño y fijarlo en el pecho
+    if (nodes.heart.length > 0) {
+      model.updateMatrixWorld(true);
+      const rawHeartGroup = new THREE.Group();
+
+      nodes.heart.forEach((mesh) => {
+        mesh.visible = true;
+        rawHeartGroup.attach(mesh); // Conserva su transformación mundial exacta
+      });
+
+      const hBox = new THREE.Box3().setFromObject(rawHeartGroup);
+      const hSize = hBox.getSize(new THREE.Vector3());
+      const hCenter = hBox.getCenter(new THREE.Vector3());
+      const maxHeartDim = Math.max(hSize.x, hSize.y, hSize.z);
+
+      // Escalar el corazón para que mida 0.13 unidades (proporción anatómica real)
+      const heartScale = 0.13 / maxHeartDim;
+      rawHeartGroup.scale.multiplyScalar(heartScale);
+      rawHeartGroup.position.sub(hCenter.multiplyScalar(heartScale));
+
+      // Pivote limpio ubicado exactamente en la cavidad torácica izquierda
+      heartPivot = new THREE.Group();
+      heartPivot.position.set(-0.035, 1.24, 0.035);
+      heartPivot.add(rawHeartGroup);
+      scene.add(heartPivot);
     }
 
-    scene.add(model);
     statusEl.textContent = 'Modelo 3D Activo • Simulación en vivo';
     updateSimulation();
   },
@@ -206,16 +210,16 @@ document.getElementById('btn-critical').addEventListener('click', () => {
   updateSimulation();
 });
 
-// 7. Animación de latido respetando la escala original del corazón
+// 7. Animación de latido desde el pivote centrado en el pecho
 const clock = new THREE.Clock();
 function animate() {
   requestAnimationFrame(animate);
   const t = clock.getElapsedTime();
   const bpm = Number(bpmSlider.value);
-  const pulse = 1 + Math.sin(t * (bpm / 60) * Math.PI * 2) * 0.06;
+  const pulse = 1 + Math.sin(t * (bpm / 60) * Math.PI * 2) * 0.08;
 
-  if (heartGroup) {
-    heartGroup.scale.copy(heartBaseScale).multiplyScalar(pulse);
+  if (heartPivot) {
+    heartPivot.scale.setScalar(pulse);
   }
 
   controls.update();
