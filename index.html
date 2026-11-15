@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AstroVital | ZeroG-Pulse HUD 3D</title>
+  <title>Órbita / Bienestar | AstroVital 3D</title>
   <link rel="stylesheet" href="ui/styles.css" />
   <script type="importmap">
     {
@@ -15,66 +15,133 @@
   </script>
 </head>
 <body>
-  <header class="hud-header">
-    <div>
-      <h1>ASTROVITAL <span class="badge">HUD 3D</span></h1>
-      <p>Simulación Biomédica en Microgravedad — Equipo ZeroG-Pulse</p>
+  <div class="app-shell">
+    <!-- Encabezado estilo Misión Aurora -->
+    <header class="top-header">
+      <div class="brand-pill">
+        <span class="dot"></span>
+        <span>ÓRBITA / BIENESTAR</span>
+      </div>
+      <p class="mission-subtitle">CENTRO DE SALUD · MISIÓN AURORA</p>
+      <div class="greeting-row">
+        <div>
+          <h1>Hola, tripulante</h1>
+          <p class="lead-text">Resumen personal de bienestar y signos vitales.</p>
+        </div>
+        <div id="connection-status" class="status-badge">Cargando modelo...</div>
+      </div>
+    </header>
+
+    <!-- Barra de seguimiento -->
+    <div class="mission-bar">
+      <span class="bar-icon">⊡</span>
+      <span>SEGUIMIENTO DE MISIÓN · ASTROVITAL</span>
     </div>
-    <div id="connection-status" class="status-pill">Cargando modelo 3D...</div>
-  </header>
 
-  <main class="hud-layout">
-    <!-- Visor 3D -->
-    <section class="viewer-panel">
-      <div id="canvas-container"></div>
-      <div class="viewer-hint">Arrastra para rotar • Rueda/Pellizco para zoom</div>
-    </section>
-
-    <!-- Panel de Simulación y Telemetría -->
-    <aside class="controls-panel">
-      <h2>Simulador de Microgravedad</h2>
-
-      <div class="control-group">
-        <label for="days-slider">Días en órbita: <strong id="days-val">45 días</strong></label>
-        <input type="range" id="days-slider" min="1" max="365" value="45" />
-      </div>
-
-      <div class="control-group">
-        <label for="bpm-slider">Ritmo Cardíaco (BPM): <strong id="bpm-val">78 BPM</strong></label>
-        <input type="range" id="bpm-slider" min="50" max="175" value="78" />
-      </div>
-
-      <div class="control-group">
-        <label for="exercise-slider">Contramedidas / Ejercicio diario: <strong id="exercise-val">60%</strong></label>
-        <input type="range" id="exercise-slider" min="0" max="100" value="60" />
-      </div>
-
-      <div class="presets">
-        <button type="button" id="btn-nominal">Órbita Nominal</button>
-        <button type="button" id="btn-eva">Caminata EVA</button>
-        <button type="button" id="btn-critical">Alerta Crítica</button>
-      </div>
-
-      <div id="metrics-grid" class="metrics-grid">
-        <div class="metric-card">
-          <span>Corazón (heart)</span>
-          <strong id="risk-heart">Óptimo</strong>
+    <!-- Grid Principal -->
+    <main class="main-grid">
+      <!-- Tarjeta Izquierda: Visor 3D Tripulante -->
+      <section class="card viewer-card">
+        <div class="card-header">
+          <div>
+            <h2>Tripulante</h2>
+            <p class="card-sub">Modelo anatómico local · arrastra la figura para girarla</p>
+          </div>
+          <span class="tag-pill">ESCANEO 3D</span>
         </div>
-        <div class="metric-card">
-          <span>Columna (bone_spine)</span>
-          <strong id="risk-spine">Leve</strong>
+
+        <div class="canvas-wrapper">
+          <div id="canvas-container"></div>
         </div>
-        <div class="metric-card">
-          <span>Fémur Izq/Der</span>
-          <strong id="risk-femur">Leve</strong>
-        </div>
-        <div class="metric-card">
-          <span>Masa Muscular (body)</span>
-          <strong id="risk-body">Estable</strong>
-        </div>
+
+        <p class="canvas-footer-note">Modelo anatómico listo · arrastra para girarlo</p>
+
+        <button type="button" id="btn-scan" class="primary-btn">
+          <span>✳</span> Escanear y guardar resultados
+        </button>
+      </section>
+
+      <!-- Columna Derecha: Simulación y Estado Biomédico -->
+      <div class="right-column">
+        <!-- Tarjeta de Controles de Simulación -->
+        <section class="card">
+          <div class="card-header">
+            <div>
+              <h2>Telemetría simulada</h2>
+              <p class="card-sub">Ajusta parámetros orbitales para evaluar desgaste</p>
+            </div>
+            <span class="tag-pill">SIMULADOR</span>
+          </div>
+
+          <div class="sliders-list">
+            <div class="slider-item">
+              <div class="slider-labels">
+                <span>Días en órbita</span>
+                <strong id="days-val">45 días</strong>
+              </div>
+              <input type="range" id="days-slider" min="1" max="365" value="45" />
+            </div>
+
+            <div class="slider-item">
+              <div class="slider-labels">
+                <span>Ritmo cardíaco (BPM)</span>
+                <strong id="bpm-val">78 BPM</strong>
+              </div>
+              <input type="range" id="bpm-slider" min="50" max="175" value="78" />
+            </div>
+
+            <div class="slider-item">
+              <div class="slider-labels">
+                <span>Contramedidas / Ejercicio</span>
+                <strong id="exercise-val">60%</strong>
+              </div>
+              <input type="range" id="exercise-slider" min="0" max="100" value="60" />
+            </div>
+          </div>
+
+          <div class="preset-row">
+            <button type="button" id="btn-nominal" class="secondary-btn">Órbita nominal</button>
+            <button type="button" id="btn-eva" class="secondary-btn">Caminata EVA</button>
+            <button type="button" id="btn-critical" class="secondary-btn">Alerta crítica</button>
+          </div>
+        </section>
+
+        <!-- Tarjeta de Diagnóstico por Nodo -->
+        <section class="card">
+          <div class="card-header">
+            <div>
+              <h2>Estado anatómico</h2>
+              <p class="card-sub">Evaluación en tiempo real por sistema</p>
+            </div>
+            <span class="tag-pill">JSON LISTO</span>
+          </div>
+
+          <div id="metrics-grid" class="metrics-grid">
+            <div class="metric-box">
+              <span class="metric-name">Corazón (heart)</span>
+              <strong id="risk-heart" class="metric-status">Óptimo</strong>
+            </div>
+            <div class="metric-box">
+              <span class="metric-name">Columna (bone_spine)</span>
+              <strong id="risk-spine" class="metric-status">Óptimo</strong>
+            </div>
+            <div class="metric-box">
+              <span class="metric-name">Fémur Izq / Der</span>
+              <strong id="risk-femur" class="metric-status">Óptimo</strong>
+            </div>
+            <div class="metric-box">
+              <span class="metric-name">Masa muscular (body)</span>
+              <strong id="risk-body" class="metric-status">Óptimo</strong>
+            </div>
+          </div>
+
+          <div id="scan-log" class="scan-log">
+            Último escaneo: pendiente de registro manual.
+          </div>
+        </section>
       </div>
-    </aside>
-  </main>
+    </main>
+  </div>
 
   <script type="module" src="ui/app.js"></script>
 </body>
