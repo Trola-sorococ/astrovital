@@ -67,19 +67,24 @@ function assignNodeMaterials(root) {
         roughness: 0.2,
         depthWrite: false
       });
+    } else if (matchedKey === 'heart') {
+      obj.renderOrder = 3;
+      obj.material = new THREE.MeshStandardMaterial({
+        color: 0xff3355,
+        emissive: 0xff3355,
+        emissiveIntensity: 1.1,
+        roughness: 0.3,
+        depthTest: false
+      });
     } else {
       obj.renderOrder = 2;
       obj.material = new THREE.MeshStandardMaterial({
         color: 0xd8e8ff,
         emissive: 0x000000,
-        emissiveIntensity: 0.9,
+        emissiveIntensity: 0.65,
         roughness: 0.35
       });
     }
-
-    nodes[matchedKey].push(obj);
-  });
-}
 
 // 5. Cargar modelo_zerog_pulse.glb con DRACOLoader
 const dracoLoader = new DRACOLoader();
