@@ -59,18 +59,20 @@ function assignNodeMaterials(root) {
     }
 
     if (matchedKey === 'body') {
+      obj.renderOrder = 1;
       obj.material = new THREE.MeshStandardMaterial({
         color: 0x00e5ff,
         transparent: true,
-        opacity: 0.22,
+        opacity: 0.10,
         roughness: 0.2,
         depthWrite: false
       });
     } else {
+      obj.renderOrder = 2;
       obj.material = new THREE.MeshStandardMaterial({
         color: 0xd8e8ff,
         emissive: 0x000000,
-        emissiveIntensity: 0.45,
+        emissiveIntensity: 0.9,
         roughness: 0.35
       });
     }
