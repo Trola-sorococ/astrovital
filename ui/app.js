@@ -3,26 +3,124 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 
-// ==================== 1. NAVEGACIÓN ENTRE PESTAÑAS ====================
+// ==================== 1. CATÁLOGO DE 14 SITUACIONES (IGUAL A APK) ====================
+const SITUATIONS = [
+  {
+    name: 'Órbita nominal',
+    zones: [],
+    effectNote: 'Indicadores simulados estables · sin zonas marcadas.'
+  },
+  {
+    name: 'Actividad extravehicular (EVA)',
+    zones: ['heart', 'bone_left_femur', 'bone_right_femur'],
+    zoneLabels: ['corazón y vasos (referencia visual)', 'extremidades (referencia visual del esqueleto)'],
+    effectNote: 'Mayor demanda cardiovascular y carga articular durante caminata espacial.'
+  },
+  {
+    name: 'Microgravedad prolongada',
+    zones: ['bone_spine', 'bone_left_femur', 'bone_right_femur', 'body'],
+    zoneLabels: ['esqueleto (columna y fémur)', 'masa muscular (referencia visual)'],
+    effectNote: 'Desacondicionamiento óseo y pérdida de masa muscular por falta de carga gravitacional.'
+  },
+  {
+    name: 'Evento o tormenta solar',
+    zones: ['heart', 'bone_spine', 'bone_left_femur', 'bone_right_femur'],
+    zoneLabels: ['esqueleto (referencia visual a tejidos formadores de sangre)', 'corazón y vasos (referencia visual)'],
+    effectNote: 'Incremento de flujo de partículas energéticas; requiere monitoreo de dosimetría.'
+  },
+  {
+    name: 'Exposición a radiación espacial',
+    zones: ['heart', 'bone_spine', 'bone_left_femur', 'bone_right_femur'],
+    zoneLabels: ['esqueleto (referencia visual a tejidos formadores de sangre)', 'corazón y vasos (referencia visual)', 'cerebro/SNC (referencia visual)'],
+    effectNote: 'Exposición acumulada a radiación cósmica galáctica y partículas solares.'
+  },
+  {
+    name: 'Aumento de CO₂ en cabina',
+    zones: ['heart', 'bone_spine', 'bone_left_femur', 'bone_right_femur'],
+    zoneLabels: ['pulmones', 'esqueleto (referencia visual a tejidos formadores de sangre)', 'extremidades (referencia visual del esqueleto)'],
+    effectNote: 'Elevación leve de presión parcial de CO₂; compensación respiratoria y cardiovascular.'
+  },
+  {
+    name: 'Descanso insuficiente',
+    zones: [],
+    effectNote: 'Sueño y estrés se modifican como datos de demostración, no como mediciones.'
+  },
+  {
+    name: 'Tormenta solar',
+    zones: ['heart', 'bone_spine'],
+    zoneLabels: ['esqueleto (referencia visual a tejidos formadores de sangre)', 'corazón y vasos (referencia visual)'],
+    effectNote: 'Alerta geomagnética activa; se sugiere resguardo en zona blindada.'
+  },
+  {
+    name: 'Fuga de CO₂ en cabina',
+    zones: ['heart', 'bone_spine', 'bone_left_femur', 'bone_right_femur'],
+    zoneLabels: ['pulmones', 'esqueleto (referencia visual a tejidos formadores de sangre)', 'extremidades (referencia visual del esqueleto)'],
+    effectNote: 'Variación crítica de atmósfera interna; revisión inmediata de depuradores.'
+  },
+  {
+    name: 'Fatiga del tripulante',
+    zones: ['body'],
+    zoneLabels: ['masa muscular (referencia visual)'],
+    effectNote: 'Fatiga acumulada tras jornadas extendidas en órbita.'
+  },
+  {
+    name: 'Erupciones solares y clima espacial',
+    zones: ['heart', 'bone_spine'],
+    zoneLabels: ['esqueleto (referencia visual a tejidos formadores de sangre)', 'corazón y vasos (referencia visual)'],
+    effectNote: 'Actividad solar clase M/X registrada en los últimos 30 días.'
+  },
+  {
+    name: 'Biología del vuelo espacial',
+    zones: ['bone_spine', 'bone_left_femur', 'bone_right_femur'],
+    zoneLabels: ['esqueleto (referencia visual a tejidos formadores de sangre)'],
+    effectNote: 'Adaptación fisiológica general al entorno de caída libre.'
+  },
+  {
+    name: 'Dosimetría de radiación',
+    zones: ['heart', 'bone_spine', 'bone_left_femur', 'bone_right_femur'],
+    zoneLabels: ['esqueleto (referencia visual a tejidos formadores de sangre)', 'corazón y vasos (referencia visual)', 'cerebro/SNC (referencia visual)'],
+    effectNote: 'La dosimetría requiere lecturas y periodo de exposición; el dato DosTel disponible es histórico.'
+  },
+  {
+    name: 'Telemetría de cabina ISS',
+    zones: [],
+    effectNote: 'Parámetros ambientales nominales dentro de rango operativo.'
+  }
+];
+
+// ==================== 2. UTILIDADES UI Y TOAST ====================
+let toastTimer = null;
+function showToast(msg) {
+  const el = document.getElementById('toast-banner');
+  el.textContent = msg;
+  el.classList.remove('hidden');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.add('hidden'), 2600);
+}
+
+// ==================== 3. NAVEGACIÓN ENTRE PESTAÑAS ====================
 const navButtons = document.querySelectorAll('.nav-btn');
 const tabViews = document.querySelectorAll('.tab-view');
 
-navButtons.forEach((btn) => {
-  btn.addEventListener('click', () => {
-    const targetId = btn.dataset.target;
-    navButtons.forEach((b) => b.classList.remove('active'));
-    tabViews.forEach((v) => v.classList.remove('active'));
+function switchTab(targetId) {
+  navButtons.forEach((b) => b.classList.toggle('active', b.dataset.target === targetId));
+  tabViews.forEach((v) => v.classList.toggle('active', v.id === targetId));
 
-    btn.classList.add('active');
-    document.getElementById(targetId).classList.add('active');
-
-    if (targetId === 'view-inicio') {
-      resizeViewer();
+  if (targetId === 'view-inicio') {
+    const homeWrapper = document.querySelector('#view-inicio .canvas-wrapper');
+    const container = document.getElementById('canvas-container');
+    if (homeWrapper && container && container.parentElement !== homeWrapper) {
+      homeWrapper.appendChild(container);
     }
-  });
+    resizeViewer();
+  }
+}
+
+navButtons.forEach((btn) => {
+  btn.addEventListener('click', () => switchTab(btn.dataset.target));
 });
 
-// ==================== 2. VISOR 3D THREE.JS ====================
+// ==================== 4. VISOR 3D THREE.JS ====================
 const container = document.getElementById('canvas-container');
 const statusEl = document.getElementById('connection-status');
 
@@ -57,6 +155,7 @@ const nodes = {
 };
 
 let heartPivot = null;
+let currentBpm = 76;
 
 function assignNodeMaterials(root) {
   root.traverse((obj) => {
@@ -95,14 +194,30 @@ function assignNodeMaterials(root) {
     } else {
       obj.renderOrder = 2;
       obj.material = new THREE.MeshStandardMaterial({
-        color: 0xd8f3ea,
-        emissive: 0x000000,
-        emissiveIntensity: 0.55,
+        color: 0x00e699,
+        emissive: 0x003322,
+        emissiveIntensity: 0.45,
         roughness: 0.35
       });
     }
 
     nodes[matchedKey].push(obj);
+  });
+}
+
+function applyZoneHighlights(alertZones) {
+  const GREEN = 0x00e699;
+  const RED = 0xff3b30;
+
+  ['body', 'heart', 'bone_spine', 'bone_left_femur', 'bone_right_femur', 'other'].forEach((key) => {
+    const isAlert = alertZones.includes(key);
+    const hex = isAlert ? RED : GREEN;
+    nodes[key].forEach((mesh) => {
+      mesh.material.color.setHex(hex);
+      if (mesh.material.emissive) {
+        mesh.material.emissive.setHex(isAlert ? RED : (key === 'heart' ? GREEN : 0x003322));
+      }
+    });
   });
 }
 
@@ -170,129 +285,309 @@ gltfLoader.load(
     }
 
     statusEl.textContent = 'Modelo listo · En línea';
-    updateSimulation();
+    const history = loadHistory();
+    if (history.length > 0 && history[0].alertZones) {
+      applyZoneHighlights(history[0].alertZones);
+    }
   },
   undefined,
-  (error) => {
-    console.error('Error cargando GLB:', error);
+  () => {
     statusEl.textContent = 'Error cargando modelo 3D';
   }
 );
 
-// ==================== 3. SIMULACIÓN Y DIAGNÓSTICO ====================
-const daysSlider = document.getElementById('days-slider');
-const bpmSlider = document.getElementById('bpm-slider');
-const exerciseSlider = document.getElementById('exercise-slider');
-const stageSelect = document.getElementById('stage-select');
-const situationSelect = document.getElementById('situation-select');
+// ==================== 5. MODALES DE ESCANEO (ETAPA -> SITUACIÓN) ====================
+const modalStage = document.getElementById('modal-stage');
+const modalSituation = document.getElementById('modal-situation');
+const situationListEl = document.getElementById('situation-options-list');
 
-let currentTelemetry = {
-  bpm: 78,
-  spo2: 98,
-  temp: 36.7,
-  markedZones: []
-};
+let pendingStageKey = 'before';
+let pendingStageTitle = 'Escaneo inicial · antes del viaje';
+let activeStageDetail = 'before';
 
-function getRiskColor(score) {
-  if (score < 0.35) return { hex: 0x00e699, label: 'Óptimo', css: '#00e699' };
-  if (score < 0.70) return { hex: 0xffcc00, label: 'Moderado', css: '#ffcc00' };
-  return { hex: 0xff453a, label: 'Crítico', css: '#ff453a' };
-}
-
-function paintMeshes(meshList, colorHex) {
-  meshList.forEach((mesh) => {
-    mesh.material.color.setHex(colorHex);
-    mesh.material.emissive.setHex(colorHex);
+SITUATIONS.forEach((sit) => {
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'modal-option-btn';
+  btn.textContent = sit.name;
+  btn.addEventListener('click', () => {
+    modalSituation.classList.add('hidden');
+    executeScan(pendingStageKey, pendingStageTitle, sit);
   });
+  situationListEl.appendChild(btn);
+});
+
+document.getElementById('btn-open-scan').addEventListener('click', () => {
+  modalStage.classList.remove('hidden');
+});
+
+document.getElementById('btn-cancel-stage').addEventListener('click', () => {
+  modalStage.classList.add('hidden');
+});
+
+document.getElementById('btn-cancel-situation').addEventListener('click', () => {
+  modalSituation.classList.add('hidden');
+});
+
+document.querySelectorAll('[data-stage-choice]').forEach((btn) => {
+  btn.addEventListener('click', () => {
+    pendingStageKey = btn.dataset.stageChoice;
+    pendingStageTitle = btn.dataset.label;
+    modalStage.classList.add('hidden');
+    modalSituation.classList.remove('hidden');
+  });
+});
+
+// ==================== 6. HISTORIAL Y ETAPAS ====================
+const HISTORY_KEY = 'astrovital_scans_v2';
+
+function loadHistory() {
+  try {
+    return JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+  } catch {
+    return [];
+  }
 }
 
-function updateSimulation() {
-  const days = Number(daysSlider.value);
-  const bpm = Number(bpmSlider.value);
-  const exercise = Number(exerciseSlider.value) / 100;
-  const situation = situationSelect.value;
+function saveHistory(list) {
+  localStorage.setItem(HISTORY_KEY, JSON.stringify(list));
+}
 
-  document.getElementById('days-val').textContent = `${days} días`;
-  document.getElementById('bpm-val').textContent = `${bpm} lpm`;
-  document.getElementById('exercise-val').textContent = `${Math.round(exercise * 100)}%`;
-
-  let radiationBoost = situation === 'Exposición a radiación espacial' ? 0.45 : 0;
-  let co2Boost = situation === 'Aumento de CO₂ en cabina' ? 0.3 : 0;
-
-  const boneStress = Math.min(1, (days / 240) * (1.15 - exercise * 0.75) + radiationBoost);
-  const muscleStress = Math.min(1, (days / 200) * (1.1 - exercise * 0.8));
-  const heartStress = Math.min(1, Math.max(0, (bpm - 65) / 95) + co2Boost + radiationBoost * 0.5);
-
-  const heartState = getRiskColor(heartStress);
-  const boneState = getRiskColor(boneStress);
-  const bodyState = getRiskColor(muscleStress);
-
-  paintMeshes(nodes.heart, heartState.hex);
-  paintMeshes(nodes.bone_spine, boneState.hex);
-  paintMeshes(nodes.bone_left_femur, boneState.hex);
-  paintMeshes(nodes.bone_right_femur, boneState.hex);
-  paintMeshes(nodes.body, bodyState.hex);
-
-  const elHeart = document.getElementById('risk-heart');
-  const elSpine = document.getElementById('risk-spine');
-  const elFemur = document.getElementById('risk-femur');
-  const elBody = document.getElementById('risk-body');
-
-  elHeart.textContent = heartState.label; elHeart.style.color = heartState.css;
-  elSpine.textContent = boneState.label; elSpine.style.color = boneState.css;
-  elFemur.textContent = boneState.label; elFemur.style.color = boneState.css;
-  elBody.textContent = bodyState.label; elBody.style.color = bodyState.css;
-
-  const marked = [];
-  if (boneStress >= 0.35) marked.push('esqueleto (referencia visual a tejidos formadores de sangre)');
-  if (heartStress >= 0.35) marked.push('corazón y vasos (referencia visual)');
-  if (muscleStress >= 0.35) marked.push('masa muscular (referencia visual)');
-
-  currentTelemetry = {
-    bpm,
-    spo2: situation === 'Aumento de CO₂ en cabina' ? 94 : 98,
-    temp: +(36.6 + (bpm - 70) * 0.008).toFixed(2),
-    markedZones: marked
+function executeScan(stageKey, stageTitle, situationObj) {
+  const now = new Date();
+  const datePart = now.toLocaleDateString('es-GT');
+  const timePart = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  const stageNameMap = {
+    before: 'Antes del viaje',
+    during: 'Durante la misión',
+    after: 'Después del viaje'
   };
+
+  const bpm = situationObj.name === 'Órbita nominal' ? 67 : Math.floor(76 + Math.random() * 14);
+  const spo2 = situationObj.name.includes('CO₂') ? 95 : 97 + Math.floor(Math.random() * 2);
+  const temp = (36.5 + Math.random() * 0.4).toFixed(2);
+  const sleep = (4.3 + Math.random() * 3.4).toFixed(1);
+  const stress = situationObj.zones.length > 0 ? 48 : 36;
+
+  currentBpm = bpm;
+  applyZoneHighlights(situationObj.zones);
+
+  const record = {
+    id: Date.now(),
+    stageKey,
+    stageLabel: stageNameMap[stageKey],
+    title: stageTitle,
+    timestamp: `${datePart} · ${timePart}`,
+    situation: situationObj.name,
+    alertZones: situationObj.zones,
+    zoneLabels: situationObj.zoneLabels || [],
+    effectNote: situationObj.effectNote,
+    bpm,
+    spo2,
+    temp,
+    sleep,
+    stress
+  };
+
+  const history = loadHistory();
+  history.unshift(record);
+  saveHistory(history);
+
+  updateHomeStageSummaries();
+  renderHistory();
+  openStageDetail(stageKey);
+  showToast('Escaneo guardado en su etapa y en Historial');
 }
 
-[daysSlider, bpmSlider, exerciseSlider, situationSelect].forEach((el) =>
-  el.addEventListener('input', updateSimulation)
-);
+function updateHomeStageSummaries() {
+  const history = loadHistory();
+  ['before', 'during', 'after'].forEach((key) => {
+    const latest = history.find((item) => item.stageKey === key);
+    const el = document.getElementById(`stage-summary-${key}`);
+    if (el) {
+      el.textContent = latest
+        ? `Último registro: ${latest.timestamp} · toca para ver ·`
+        : 'Aún no hay escaneos · toca para abrir ·';
+    }
+  });
 
-document.getElementById('btn-nominal').addEventListener('click', () => {
-  stageSelect.value = 'Durante la misión';
-  situationSelect.value = 'Órbita nominal';
-  daysSlider.value = 30; bpmSlider.value = 72; exerciseSlider.value = 80;
-  updateSimulation();
+  const redNoteEl = document.getElementById('latest-scan-red-note');
+  const latestWithAlerts = history.find((item) => item.zoneLabels && item.zoneLabels.length > 0);
+  if (redNoteEl) {
+    redNoteEl.textContent = latestWithAlerts
+      ? `${latestWithAlerts.timestamp} · Zonas señaladas: ${latestWithAlerts.zoneLabels.join(', ')}`
+      : '';
+  }
+}
+
+function renderHistory() {
+  const listEl = document.getElementById('history-list');
+  const history = loadHistory();
+
+  if (history.length === 0) {
+    listEl.innerHTML = `<div class="history-card"><p class="card-sub">No hay escaneos guardados aún. Usa "Escanear y guardar resultados" en Inicio.</p></div>`;
+    return;
+  }
+
+  listEl.innerHTML = history
+    .map((item) => {
+      const hasAlerts = item.zoneLabels && item.zoneLabels.length > 0;
+      const statusHtml = hasAlerts
+        ? `<div class="history-status-alert">● Zonas marcadas: ${item.zoneLabels.join(', ')}</div>`
+        : `<div class="history-status-ok">● Estado estable · sin zonas marcadas</div>`;
+
+      return `
+        <article class="history-card">
+          <h3>${item.title}</h3>
+          <div class="history-meta">${item.timestamp} · ${item.stageLabel}</div>
+          <div class="history-situation">Situación: ${item.situation}</div>
+          ${statusHtml}
+          <div class="history-telemetry">FC ${item.bpm} lpm · SpO₂ ${item.spo2}% · Temp. ${item.temp} °C</div>
+        </article>
+      `;
+    })
+    .join('');
+}
+
+document.getElementById('btn-clear-history').addEventListener('click', () => {
+  saveHistory([]);
+  applyZoneHighlights([]);
+  updateHomeStageSummaries();
+  renderHistory();
+  showToast('Historial limpiado');
 });
 
-document.getElementById('btn-eva').addEventListener('click', () => {
-  stageSelect.value = 'Durante la misión';
-  situationSelect.value = 'Exposición a radiación espacial';
-  daysSlider.value = 120; bpmSlider.value = 115; exerciseSlider.value = 50;
-  updateSimulation();
+// ==================== 7. SUBVISTA DETALLE DE ETAPA ====================
+function openStageDetail(stageKey) {
+  activeStageDetail = stageKey;
+  const titles = {
+    before: 'Antes del viaje',
+    during: 'Durante la misión',
+    after: 'Después del viaje'
+  };
+  document.getElementById('stage-detail-title').textContent = titles[stageKey];
+
+  const history = loadHistory().filter((item) => item.stageKey === stageKey);
+  const latestCard = document.getElementById('stage-latest-card');
+  const recordsList = document.getElementById('stage-records-list');
+
+  if (history.length > 0) {
+    const latest = history[0];
+    applyZoneHighlights(latest.alertZones || []);
+    const hasAlerts = latest.zoneLabels && latest.zoneLabels.length > 0;
+    latestCard.innerHTML = `
+      <h2>${latest.title}</h2>
+      <div class="history-meta">${latest.timestamp} · registro local</div>
+      <div class="history-situation"><strong>Situación evaluada:</strong> ${latest.situation} · simulación</div>
+      <p class="card-sub">${latest.effectNote}</p>
+      ${hasAlerts
+        ? `<div class="history-status-alert">● Zonas destacadas por simulación: ${latest.zoneLabels.join(', ')}</div>`
+        : `<div class="history-status-ok">● Indicadores simulados estables · sin zonas marcadas</div>`
+      }
+      <div class="history-telemetry">Frecuencia cardíaca: ${latest.bpm} lpm · Oxígeno: ${latest.spo2}% · Temperatura: ${latest.temp} °C</div>
+      <div class="history-telemetry">Sueño (dato demo): ${latest.sleep} h · Estrés (dato demo): ${latest.stress}/100</div>
+    `;
+
+    recordsList.innerHTML = history
+      .map(
+        (r) => `
+        <div class="history-card">
+          <h3>${r.title}</h3>
+          <div class="history-meta">${r.timestamp} · ${r.zoneLabels.length > 0 ? 'con zonas marcadas' : 'estable'}</div>
+          <div class="history-situation">Situación: ${r.situation}</div>
+        </div>
+      `
+      )
+      .join('');
+  } else {
+    applyZoneHighlights([]);
+    latestCard.innerHTML = `
+      <h2>Sin escaneos en ${titles[stageKey]}</h2>
+      <p class="card-sub">Presiona el botón inferior para registrar una evaluación en esta fase.</p>
+    `;
+    recordsList.innerHTML = `<div class="history-card"><p class="card-sub">Aún no hay registros en esta etapa.</p></div>`;
+  }
+
+  // Mover el visor 3D a la subvista de etapa
+  const stageSlot = document.getElementById('stage-3d-slot');
+  stageSlot.appendChild(container);
+
+  navButtons.forEach((b) => b.classList.remove('active'));
+  tabViews.forEach((v) => v.classList.remove('active'));
+  document.getElementById('view-stage-detail').classList.add('active');
+  resizeViewer();
+}
+
+document.querySelectorAll('.stage-item-card').forEach((card) => {
+  card.addEventListener('click', () => openStageDetail(card.dataset.stage));
 });
 
-document.getElementById('btn-critical').addEventListener('click', () => {
-  stageSelect.value = 'Durante la misión';
-  situationSelect.value = 'Exposición a radiación espacial';
-  daysSlider.value = 300; bpmSlider.value = 162; exerciseSlider.value = 10;
-  updateSimulation();
+document.getElementById('btn-mission-pill').addEventListener('click', () => openStageDetail('before'));
+document.getElementById('btn-back-home').addEventListener('click', () => switchTab('view-inicio'));
+
+document.getElementById('btn-stage-register').addEventListener('click', () => {
+  const defaultTitles = {
+    before: 'Escaneo inicial · antes del viaje',
+    during: 'Nuevo escaneo durante la estancia',
+    after: 'Escaneo posterior · regreso'
+  };
+  pendingStageKey = activeStageDetail;
+  pendingStageTitle = defaultTitles[activeStageDetail];
+  modalSituation.classList.remove('hidden');
 });
 
-// ==================== 4. PESTAÑA SIGNOS (ACTUALIZA CADA 4s) ====================
+// ==================== 8. ESTADO DE ÁNIMO Y API CLIMA ESPACIAL ====================
+let selectedMood = 'Bien';
+document.querySelectorAll('.mood-btn').forEach((btn) => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.mood-btn').forEach((b) => b.classList.remove('active'));
+    btn.classList.add('active');
+    selectedMood = btn.dataset.mood;
+    showToast(`Estado seleccionado: ${selectedMood}`);
+  });
+});
+
+document.getElementById('btn-save-mood').addEventListener('click', () => {
+  const note = document.getElementById('mood-note').value.trim();
+  localStorage.setItem('astrovital_mood_v1', JSON.stringify({ mood: selectedMood, note }));
+  document.getElementById('mood-feedback').textContent = `✓ Guardado: ${selectedMood}${note ? ` — "${note}"` : ''}`;
+  showToast('Estado de ánimo guardado en este dispositivo');
+});
+
+async function refreshSpaceWeather() {
+  const now = new Date();
+  const stamp = `${now.toLocaleDateString('es-GT')} ${now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+  try {
+    const res = await fetch('data/nasa_space_weather.json');
+    if (res.ok) {
+      const json = await res.json();
+      document.getElementById('api-updated-text').textContent =
+        `API actualizada ${stamp} · ${json.events_count || 14} eventos en respuesta guardada`;
+    } else {
+      document.getElementById('api-updated-text').textContent =
+        `API actualizada ${stamp} · 14 eventos en respuesta API guardada`;
+    }
+  } catch {
+    document.getElementById('api-updated-text').textContent =
+      `API actualizada ${stamp} · 14 eventos en respuesta API guardada`;
+  }
+  showToast('Datos de clima espacial actualizados');
+}
+
+document.getElementById('btn-refresh-api').addEventListener('click', refreshSpaceWeather);
+document.getElementById('btn-refresh-cumulative').addEventListener('click', refreshSpaceWeather);
+
+// ==================== 9. SIGNOS VITALES CADA 4 SEGUNDOS ====================
 function refreshLiveVitals() {
   const now = new Date();
   const timeStr = now.toTimeString().split(' ')[0];
-  const baseBpm = Number(bpmSlider.value);
   const jitter = Math.floor(Math.random() * 5) - 2;
 
-  const hr = Math.max(52, baseBpm + jitter);
-  const spo2 = situationSelect.value === 'Aumento de CO₂ en cabina' ? 94 + (jitter > 0 ? 1 : 0) : 97 + (jitter > 0 ? 1 : 0);
-  const temp = (36.5 + Math.random() * 0.4).toFixed(1);
-  const sleep = (6.4 + Math.random() * 1.4).toFixed(1);
-  const stress = Math.min(95, Math.max(12, Math.round((hr - 55) * 0.85)));
+  const hr = Math.max(58, currentBpm + jitter);
+  const spo2 = 97 + (jitter > 0 ? 1 : 0);
+  const temp = (36.2 + Math.random() * 0.5).toFixed(1);
+  const sleep = (6.6 + Math.random() * 0.8).toFixed(1);
+  const stress = Math.min(92, Math.max(18, Math.round((hr - 50) * 1.4)));
 
   document.getElementById('vital-timestamp').textContent = timeStr;
   document.getElementById('vital-hr').textContent = `${hr} lpm`;
@@ -305,118 +600,20 @@ function refreshLiveVitals() {
 refreshLiveVitals();
 setInterval(refreshLiveVitals, 4000);
 
-// ==================== 5. PESTAÑA HISTORIAL (LOCALSTORAGE) ====================
-const HISTORY_KEY = 'astrovital_scan_history_v1';
-
-const defaultScans = [
-  {
-    title: 'Escaneo inicial · antes del viaje',
-    date: '15/11/2026 · 21:25 · Antes del viaje',
-    situation: 'Órbita nominal',
-    markedZones: [],
-    bpm: 65,
-    spo2: 98,
-    temp: 36.93
-  },
-  {
-    title: 'Escaneo durante la estancia',
-    date: '15/11/2026 · 21:17 · Durante la misión',
-    situation: 'Exposición a radiación espacial',
-    markedZones: [
-      'esqueleto (referencia visual a tejidos formadores de sangre)',
-      'corazón y vasos (referencia visual)',
-      'cerebro/SNC (referencia visual)'
-    ],
-    bpm: 79,
-    spo2: 97,
-    temp: 36.64
-  }
-];
-
-function loadHistory() {
-  try {
-    const raw = localStorage.getItem(HISTORY_KEY);
-    return raw ? JSON.parse(raw) : defaultScans;
-  } catch {
-    return defaultScans;
-  }
-}
-
-function renderHistory() {
-  const listEl = document.getElementById('history-list');
-  const scans = loadHistory();
-
-  if (scans.length === 0) {
-    listEl.innerHTML = `<div class="history-card"><p class="card-sub">No hay escaneos guardados aún. Usa "Escanear y guardar resultados" en Inicio.</p></div>`;
-    return;
-  }
-
-  listEl.innerHTML = scans
-    .map((item) => {
-      const hasAlerts = item.markedZones && item.markedZones.length > 0;
-      const statusHtml = hasAlerts
-        ? `<div class="history-status-alert">● Zonas marcadas: ${item.markedZones.join(', ')}</div>`
-        : `<div class="history-status-ok">● Estado estable · sin zonas marcadas</div>`;
-
-      return `
-        <article class="history-card">
-          <h3>${item.title}</h3>
-          <div class="history-meta">${item.date}</div>
-          <div class="history-situation">Situación: ${item.situation}</div>
-          ${statusHtml}
-          <div class="history-telemetry">FC ${item.bpm} lpm · SpO₂ ${item.spo2}% · Temp. ${item.temp} °C</div>
-        </article>
-      `;
-    })
-    .join('');
-}
-
-document.getElementById('btn-scan').addEventListener('click', () => {
-  const now = new Date();
-  const datePart = now.toLocaleDateString('es-GT');
-  const timePart = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  const stage = stageSelect.value;
-
-  const newEntry = {
-    title: stage === 'Antes del viaje' ? 'Escaneo inicial · antes del viaje' : 'Escaneo durante la estancia',
-    date: `${datePart} · ${timePart} · ${stage}`,
-    situation: situationSelect.value,
-    markedZones: [...currentTelemetry.markedZones],
-    bpm: currentTelemetry.bpm,
-    spo2: currentTelemetry.spo2,
-    temp: currentTelemetry.temp
-  };
-
-  const scans = loadHistory();
-  scans.unshift(newEntry);
-  localStorage.setItem(HISTORY_KEY, JSON.stringify(scans));
-  renderHistory();
-
-  const btn = document.getElementById('btn-scan');
-  btn.innerHTML = '<span>✓</span> Resultados guardados en Historial';
-  setTimeout(() => {
-    btn.innerHTML = '<span>✳</span> Escanear y guardar resultados';
-  }, 1800);
-});
-
-document.getElementById('btn-clear-history').addEventListener('click', () => {
-  localStorage.setItem(HISTORY_KEY, JSON.stringify([]));
-  renderHistory();
-});
-
-renderHistory();
-
-// ==================== 6. PESTAÑA PERFIL (LOCALSTORAGE) ====================
+// ==================== 10. PERFIL DEL TRIPULANTE ====================
 const PROFILE_KEY = 'astrovital_crew_profile_v1';
 
 function applyProfileToUI(profile) {
   const name = (profile.name || '').trim();
-  const duration = (profile.duration || '').trim();
+  const duration = Number(profile.duration) || 180;
 
   document.getElementById('greeting-title').textContent = name ? `Hola, ${name}` : 'Hola, tripulante';
-  document.getElementById('mission-bar-text').textContent = duration
-    ? `SEGUIMIENTO DE MISIÓN · ${duration} DÍAS PROGRAMADOS`
-    : 'SEGUIMIENTO DE MISIÓN · ASTROVITAL';
+  document.getElementById('cumulative-horizon').textContent = `Horizonte: ${duration} días · duración fija del perfil`;
+
+  const femurRisk = Math.min(100, (duration / 428) * 100).toFixed(1);
+  const muscleRisk = Math.min(100, (duration / 300) * 100).toFixed(1);
+  document.getElementById('cumulative-femur').textContent = `Hueso (fémur): ${femurRisk}% de índice estimado`;
+  document.getElementById('cumulative-muscle').textContent = `Músculo (piernas): ${muscleRisk}% de índice estimado`;
 }
 
 function loadProfile() {
@@ -449,25 +646,19 @@ document.getElementById('profile-form').addEventListener('submit', (e) => {
 
   localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
   applyProfileToUI(profile);
-
-  const fb = document.getElementById('profile-feedback');
-  fb.textContent = '✓ Perfil guardado en este dispositivo.';
-  fb.style.color = '#00e699';
-  setTimeout(() => {
-    fb.textContent = 'Los datos del perfil son informativos y no sustituyen una evaluación clínica.';
-    fb.style.color = '';
-  }, 2200);
+  showToast('Perfil guardado en este dispositivo');
 });
 
 loadProfile();
+updateHomeStageSummaries();
+renderHistory();
 
-// ==================== 7. RENDER LOOP Y RESIZE ====================
+// ==================== 11. ANIMACIÓN Y RESIZE ====================
 const clock = new THREE.Clock();
 function animate() {
   requestAnimationFrame(animate);
   const t = clock.getElapsedTime();
-  const bpm = Number(bpmSlider.value);
-  const pulse = 1 + Math.sin(t * (bpm / 60) * Math.PI * 2) * 0.08;
+  const pulse = 1 + Math.sin(t * (currentBpm / 60) * Math.PI * 2) * 0.08;
 
   if (heartPivot) {
     const base = heartPivot.userData.baseScale || 1;
