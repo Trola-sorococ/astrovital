@@ -1,4 +1,4 @@
-# Referencias de Dev B — datos NASA
+# Referencias de Dev B — datos abiertos para el evento 
 
 El JSON usa los nombres y tipos del contrato. Misión, radiación y CO2 son provisionales; no deben presentarse como mediciones reales. El campo _quality permite a Dev C distinguir ese estado.
 
@@ -13,6 +13,6 @@ El JSON usa los nombres y tipos del contrato. Misión, radiación y CO2 son prov
 
 ## Actualización
 
-Instala Python 3 y requests con python -m pip install requests. Define NASA_API_KEY como variable de entorno, sin guardarla en GitHub, y ejecuta python data/ingest/fetch_nasa_data.py. El proceso no convierte una consulta fallida en cero ni µGy/h en µSv/h.
+Instala Python 3 y requests con python -m pip install requests. Define ZeroG_API_KEY como variable de entorno, sin guardarla en GitHub, y ejecuta python data/ingest/fetch_nasa_data.py. El proceso no convierte una consulta fallida en cero ni µGy/h en µSv/h.
 
 Este JSON es el primer ejemplo para que Dev C y Dev D integren el contrato. Los campos provisionales deben sustituirse por mediciones verificadas antes de la demo final.
