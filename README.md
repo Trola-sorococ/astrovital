@@ -2,7 +2,7 @@
 
 Equipo **ZeroG-Pulse** · Space Apps Challenge
 
-Aplicación web instalable (PWA) y app Android para seguir de forma visual el estado de bienestar de un astronauta antes, durante y después de una misión, usando datos abiertos de la NASA.
+Aplicación web instalable (PWA) y app Android para seguir de forma visual el estado de bienestar de un astronauta antes, durante y después de una misión, usando datos abiertos.
 
 **Demo en línea (sin registro):** <https://trola-sorococ.github.io/astrovital/>
 
@@ -14,10 +14,10 @@ Aplicación web instalable (PWA) y app Android para seguir de forma visual el es
 
 - Modelo 3D del cuerpo con zonas verdes (estables) y rojas (atención) según la situación evaluada.
 - Seguimiento por etapa de misión, historial, perfil y registro de ánimo (todo guardado en el dispositivo).
-- Llamaradas solares de los últimos 30 días **en vivo** desde NASA DONKI, con caché y sin asumir cero si falla la consulta.
+- Llamaradas solares de los últimos 30 días **en vivo** desde DONKI, con caché y sin asumir cero si falla la consulta.
 - Efectos acumulados calculados con `model/risk.js`.
 - Funciona sin conexión (Three.js y el decodificador Draco están en `vendor/`) y se puede instalar desde el navegador.
-- App Android nativa en `android/` (APK: `android/ZeroG-Pulse.apk`).
+- App Android nativa en `android/`. Se puede descargar el APK (`android/ZeroG-Pulse.apk`) con el botón **Descargar APK** de la página de Inicio.
 
 ## Idiomas / Languages
 
@@ -44,16 +44,16 @@ python -m http.server 8000
 | --- | --- |
 | `index.html`, `ui/` | Interfaz web |
 | `model/risk.js` | Modelo experimental de riesgo |
-| `data/` | `risk_inputs.json` y script de ingesta (`data/ingest/fetch_nasa_data.py`) |
+| `data/` | `risk_inputs.json` y script de ingesta (`data/ingest/fetch_open_data.py`) |
 | `assets/` | Modelo 3D GLB e íconos |
 | `vendor/three/` | Three.js r170 (MIT) y decodificador Draco, copia local |
 | `manifest.webmanifest`, `sw.js` | Instalación y uso sin conexión (PWA) |
 | `android/` | App Android (Kotlin) |
-| `docs/` | Entrega para NASA Space Apps y referencias |
+| `docs/` | Entrega para el Space Apps Challenge y referencias |
 
 ## Entrega Space Apps Challenge
 
-- Título, resumen, explicación detallada, uso de datos publicos y declaración: [`docs/ENTREGA_NASA_SPACE_APPS.md`](docs/ENTREGA_NASA_SPACE_APPS.md)
+- Título, resumen, explicación detallada, uso de datos publicos y declaración: [`docs/ENTREGA_SPACE_APPS.md`](docs/ENTREGA_SPACE_APPS.md)
 - Texto del formulario en inglés: [`docs/SUBMISSION_FORM_EN.md`](docs/SUBMISSION_FORM_EN.md)
 - Descripción del video de YouTube (inglés): [`docs/YOUTUBE_DESCRIPTION_EN.md`](docs/YOUTUBE_DESCRIPTION_EN.md)
 - Referencias y créditos: [`docs/REFERENCIAS.md`](docs/REFERENCIAS.md) · [`docs/REFERENCES_EN.md`](docs/REFERENCES_EN.md)

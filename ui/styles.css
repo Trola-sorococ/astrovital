@@ -722,3 +722,9 @@ a {
   color: var(--text-secondary);
 }
 
+
+a.primary-btn {
+  color: var(--btn-white-text);
+  text-decoration: none;
+}
+

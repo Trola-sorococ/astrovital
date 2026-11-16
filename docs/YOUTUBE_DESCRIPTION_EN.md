@@ -16,7 +16,7 @@ Web app (Spanish): https://trola-sorococ.github.io/astrovital/?lang=es
 Source code: https://github.com/Trola-sorococ/astrovital
 Slides: https://canva.link/1wiybgnzjpgqzbb
 
-OPEN NASA DATA USED:
+OPEN DATA USED:
 - DONKI solar flares (live, last 30 days): https://ccmc.gsfc.nasa.gov/tools/DONKI/
 - OSDR RadLab, ISS DosTel (historical reference): https://visualization.osdr.nasa.gov/radlab/
 - OSDR studies OSD-980 and OSD-781: https://osdr.nasa.gov/bio/repo/data/studies/OSD-980 , https://osdr.nasa.gov/bio/repo/data/studies/OSD-781
@@ -35,7 +35,7 @@ CREDITS AND THIRD-PARTY MATERIAL:
 - Music or sound effects: [none / title, author, license]
 
 DISCLAIMER:
-Vital signs in the app are simulated. The risk model is experimental and does not provide a diagnosis or a clinical prognosis. This project is not affiliated with, sponsored by or endorsed by NASA. Made by team ZeroG-Pulse for the NASA Space Apps Challenge.
+Vital signs in the app are simulated. The risk model is experimental and does not provide a diagnosis or a clinical prognosis. This project is not affiliated with, sponsored by or endorsed by any space agency. Made by team ZeroG-Pulse for the Space Apps Challenge.
 
 #SpaceApps #AstroVital #SpaceHealth #OpenData
 
@@ -47,4 +47,4 @@ Vital signs in the app are simulated. The risk model is experimental and does no
 - Audience: "No, it's not made for kids" is normal for this kind of video; choose according to YouTube's guidance.
 - Length: 30 seconds or less.
 - Do not show names, ages, phone numbers or faces of minors in the video or the thumbnail.
-- Do not use NASA logos or insignia in the video, the thumbnail or the slides.
+- Do not use any agency logos or insignia in the video, the thumbnail or the slides.

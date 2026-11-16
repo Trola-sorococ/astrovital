@@ -610,7 +610,7 @@ async function loadRiskInputs() {
   updateCumulativeEffects();
 }
 
-// --- Llamaradas solares en vivo: NASA DONKI (CCMC), últimos 30 días ---
+// --- Llamaradas solares en vivo: DONKI (CCMC), últimos 30 días ---
 const FLARES_CACHE_KEY = 'astrovital_flares_v1';
 let latestFlares = null; // null = sin dato; [] = consulta válida sin eventos
 
@@ -655,7 +655,7 @@ async function refreshSpaceWeather(manual = true) {
       .map((f) => ({ beginTime: f.beginTime, classType: f.classType }));
     latestFlares = flares;
     localStorage.setItem(FLARES_CACHE_KEY, JSON.stringify({ at: stamp, flares }));
-    renderFlares(flares, t('API NASA DONKI actualizada {0} · {1} llamaradas en los últimos 30 días', stamp, flares.length));
+    renderFlares(flares, t('API DONKI actualizada {0} · {1} llamaradas en los últimos 30 días', stamp, flares.length));
     if (manual) showToast(t('Datos de clima espacial actualizados'));
   } catch {
     let cached = null;

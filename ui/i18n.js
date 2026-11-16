@@ -54,9 +54,9 @@ const EN = {
 
   // ---- Fuentes conectadas ----
   'Fuentes conectadas': 'Connected sources',
-  'NASA DONKI · llamaradas solares (últimos 30 días) + OSDR': 'NASA DONKI · solar flares (last 30 days) + OSDR',
+  'DONKI · llamaradas solares (últimos 30 días) + OSDR': 'DONKI · solar flares (last 30 days) + OSDR',
   'JSON + API en línea': 'JSON + online API',
-  'Consultando NASA DONKI…': 'Querying NASA DONKI…',
+  'Consultando DONKI…': 'Querying DONKI…',
   'JSON · cargando data/risk_inputs.json…': 'JSON · loading data/risk_inputs.json…',
   'Radiación DosTel (OSDR RadLab): 28.303083 µGy/h · referencia histórica (2023-01-01)':
     'DosTel radiation (OSDR RadLab): 28.303083 µGy/h · historical reference (2023-01-01)',
@@ -75,8 +75,8 @@ const EN = {
   'Llamaradas DONKI: {0} evento(s) en 30 días': 'DONKI flares: {0} event(s) in 30 days',
   ' · caché del {0}': ' · cached on {0}',
   'Llamaradas DONKI: sin dato (unavailable) · no se asume cero': 'DONKI flares: no data (unavailable) · zero is not assumed',
-  'API NASA DONKI actualizada {0} · {1} llamaradas en los últimos 30 días':
-    'NASA DONKI API updated {0} · {1} flares in the last 30 days',
+  'API DONKI actualizada {0} · {1} llamaradas en los últimos 30 días':
+    'DONKI API updated {0} · {1} flares in the last 30 days',
   'Sin conexión con DONKI · mostrando la última respuesta válida ({0})':
     'No connection to DONKI · showing the last valid response ({0})',
   'Sin conexión con DONKI · sin respuesta guardada': 'No connection to DONKI · no saved response',
@@ -202,15 +202,20 @@ const EN = {
   'Perfil guardado en este dispositivo': 'Profile saved on this device',
 
   // ---- Créditos ----
-  'Créditos y datos NASA': 'Credits and NASA data',
+  'Créditos y datos abiertos': 'Credits and open data',
+  'Descargar app Android': 'Download Android app',
+  'Versión nativa de AstroVital para Android. La app está solo en español. Si Android lo pide, permite instalar apps desde esta fuente.':
+    'Native Android version of AstroVital. The app is in Spanish only. If Android asks, allow installing apps from this source.',
+  'Descargar APK (Android)': 'Download APK (Android)',
+  'APK · versión 0.7.0 · 7.7 MB': 'APK · version 0.7.0 · 7.7 MB',
   'Datos abiertos:': 'Open data:',
   '· llamaradas solares': '· solar flares',
   '· estudios OSD-980 y OSD-781': '· studies OSD-980 and OSD-781',
   '· dosimetría DosTel ISS': '· ISS DosTel dosimetry',
   '· visor 3D (MIT)': '· 3D viewer (MIT)',
   '· referencias completas': '· full references',
-  'Proyecto educativo del equipo ZeroG-Pulse (NASA Space Apps Challenge). No está afiliado ni respaldado por la NASA. No es un dispositivo médico ni sustituye una evaluación clínica.':
-    'Educational project by team ZeroG-Pulse (NASA Space Apps Challenge). Not affiliated with or endorsed by NASA. It is not a medical device and does not replace a clinical evaluation.',
+  'Proyecto educativo del equipo ZeroG-Pulse (Space Apps Challenge). No está afiliado a ninguna agencia espacial. No es un dispositivo médico ni sustituye una evaluación clínica.':
+    'Educational project by team ZeroG-Pulse (Space Apps Challenge). Not affiliated with any space agency. It is not a medical device and does not replace a clinical evaluation.',
 
   // ---- Modales ----
   '¿En qué etapa estás?': 'Which stage are you in?',
@@ -265,8 +270,8 @@ const EN = {
 
   // ---- Metadatos ----
   'Órbita / Bienestar | AstroVital': 'Orbit / Wellness | AstroVital',
-  'AstroVital: seguimiento visual del estado de salud de un astronauta con datos abiertos de la NASA (DONKI, OSDR, RadLab). Uso educativo, no clínico.':
-    'AstroVital: visual tracking of an astronaut’s health status using open NASA data (DONKI, OSDR, RadLab). Educational, non-clinical use.'
+  'AstroVital: seguimiento visual del estado de salud de un astronauta con datos abiertos (DONKI, OSDR, RadLab). Uso educativo, no clínico.':
+    'AstroVital: visual tracking of an astronaut’s health status using open data (DONKI, OSDR, RadLab). Educational, non-clinical use.'
 };
 
 /** Traduce un texto fuente en español al idioma activo y sustituye {0}, {1}… */

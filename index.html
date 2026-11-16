@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Órbita / Bienestar | AstroVital</title>
-  <meta name="description" content="AstroVital: seguimiento visual del estado de salud de un astronauta con datos abiertos de la NASA (DONKI, OSDR, RadLab). Uso educativo, no clínico." />
+  <meta name="description" content="AstroVital: seguimiento visual del estado de salud de un astronauta con datos abiertos (DONKI, OSDR, RadLab). Uso educativo, no clínico." />
   <meta name="theme-color" content="#050505" />
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="icon" type="image/png" href="assets/icon-192.png" />
@@ -117,13 +117,13 @@
             <div class="card-header">
               <div>
                 <h2>Fuentes conectadas</h2>
-                <p class="card-sub">NASA DONKI · llamaradas solares (últimos 30 días) + OSDR</p>
+                <p class="card-sub">DONKI · llamaradas solares (últimos 30 días) + OSDR</p>
               </div>
               <span class="tag-pill">JSON + API en línea</span>
             </div>
 
             <div class="telemetry-log-box">
-              <p class="log-highlight" id="api-updated-text">Consultando NASA DONKI…</p>
+              <p class="log-highlight" id="api-updated-text">Consultando DONKI…</p>
               <ul class="flare-list" id="flare-list"></ul>
               <p class="log-muted" id="json-status-text">JSON · cargando data/risk_inputs.json…</p>
               <p class="log-muted">Radiación DosTel (OSDR RadLab): 28.303083 µGy/h · referencia histórica (2023-01-01)</p>
@@ -136,6 +136,18 @@
             <button type="button" id="btn-refresh-api" class="secondary-btn full-width-btn">
               Actualizar API de clima espacial
             </button>
+          </article>
+
+          <!-- Tarjeta: descarga del APK de Android -->
+          <article class="card">
+            <div class="card-header">
+              <div>
+                <h2>Descargar app Android</h2>
+                <p class="card-sub">Versión nativa de AstroVital para Android. La app está solo en español. Si Android lo pide, permite instalar apps desde esta fuente.</p>
+              </div>
+              <span class="tag-pill">APK · versión 0.7.0 · 7.7 MB</span>
+            </div>
+            <a id="btn-download-apk" class="primary-btn" href="android/ZeroG-Pulse.apk" download="AstroVital.apk">Descargar APK (Android)</a>
           </article>
 
           <!-- Tarjeta: ¿Cómo te sientes? -->
@@ -377,16 +389,16 @@
         <p id="profile-feedback" class="disclaimer-text">Los datos del perfil son informativos y no sustituyen una evaluación clínica.</p>
       </form>
       <article class="card">
-        <h2>Créditos y datos NASA</h2>
+        <h2>Créditos y datos abiertos</h2>
         <p class="card-sub">Datos abiertos:</p>
         <ul class="credits-list">
-          <li><a href="https://ccmc.gsfc.nasa.gov/tools/DONKI/" target="_blank" rel="noopener">NASA DONKI</a> <span>· llamaradas solares</span></li>
-          <li><a href="https://osdr.nasa.gov/bio/" target="_blank" rel="noopener">NASA OSDR</a> <span>· estudios OSD-980 y OSD-781</span></li>
+          <li><a href="https://ccmc.gsfc.nasa.gov/tools/DONKI/" target="_blank" rel="noopener">DONKI</a> <span>· llamaradas solares</span></li>
+          <li><a href="https://osdr.nasa.gov/bio/" target="_blank" rel="noopener">OSDR</a> <span>· estudios OSD-980 y OSD-781</span></li>
           <li><a href="https://visualization.osdr.nasa.gov/radlab/" target="_blank" rel="noopener">OSDR RadLab</a> <span>· dosimetría DosTel ISS</span></li>
           <li><a href="https://threejs.org/" target="_blank" rel="noopener">Three.js</a> <span>· visor 3D (MIT)</span></li>
           <li><a href="docs/REFERENCIAS.md" target="_blank" rel="noopener">docs/REFERENCIAS.md</a> <span>· referencias completas</span></li>
         </ul>
-        <p class="disclaimer-text">Proyecto educativo del equipo ZeroG-Pulse (NASA Space Apps Challenge). No está afiliado ni respaldado por la NASA. No es un dispositivo médico ni sustituye una evaluación clínica.</p>
+        <p class="disclaimer-text">Proyecto educativo del equipo ZeroG-Pulse (Space Apps Challenge). No está afiliado a ninguna agencia espacial. No es un dispositivo médico ni sustituye una evaluación clínica.</p>
       </article>
     </section>
   </div>

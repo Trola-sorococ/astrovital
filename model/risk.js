@@ -27,12 +27,12 @@ export function calcularRiesgo(inputs = {}) {
     bone_spine: {
       risk: Number(riesgoSpine.toFixed(2)),
       why: `Desmineralización acumulada en ${diasMision} días de misión sin gravedad efectiva.`,
-      source: 'NASA Human Research Program (HRP) - HRP-4701'
+      source: 'Human Research Program (HRP) - HRP-4701'
     },
     bone_femur: {
       risk: Number(riesgoFemur.toFixed(2)),
       why: `Pérdida de densidad ósea por falta de carga axial en extremidades inferiores (${diasMision} días).`,
-      source: 'NASA-STD-3001 (Flight Physiological Requirements)'
+      source: 'STD-3001 (Flight Physiological Requirements)'
     },
     muscle_legs: {
       risk: Number(riesgoMusculo.toFixed(2)),
@@ -42,7 +42,7 @@ export function calcularRiesgo(inputs = {}) {
     heart: {
       risk: Number(riesgoHeart.toFixed(2)),
       why: `Estrés cardiovascular inducido por radiación de ${radiacionUSvH} uSv/h y ${flaresRecientes.length} eventos solares recientes.`,
-      source: 'NASA Space Radiation Analysis Group (SRAG)'
+      source: 'Space Radiation Analysis Group (SRAG)'
     }
   };
 }

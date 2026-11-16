@@ -48,13 +48,13 @@
         }
       ],
       "source_url": "https://visualization.osdr.nasa.gov/biodata/api/v2/query/assays/?study.characteristics.organism=mus%20musculus&format=json",
-      "source_error": "OSDR query returned HTTP 400; curated study records link directly to NASA study pages.",
+      "source_error": "OSDR query returned HTTP 400; curated study records link directly to study pages.",
       "note": "Qualitative research evidence only, not numeric clinical risk scores."
     }
   },
   "warnings": [
     "El snapshot JSON no contiene un conteo confirmado de llamaradas; la app consulta DONKI CCMC en vivo por separado.",
-    "La consulta de OSDR indicada devolvió HTTP 400; se incluyen referencias curatoriales a estudios NASA.",
+    "La consulta de OSDR indicada devolvió HTTP 400; se incluyen referencias curatoriales a estudios.",
     "RadLab no tuvo lecturas para el periodo actual; se incluye un día histórico real de DosTel de la ISS (2023-01-01)."
   ]
 }

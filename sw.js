@@ -1,5 +1,5 @@
 // Service worker de AstroVital: permite instalar la app y usarla sin conexión.
-// Estrategia: cache de la "app shell" al instalar; los datos de la NASA (DONKI) siempre van a la red.
+// Estrategia: cache de la "app shell" al instalar; los datos externos (DONKI) siempre van a la red.
 const CACHE = 'astrovital-v1';
 const SHELL = [
   './',
@@ -39,8 +39,8 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const req = event.request;
   const url = new URL(req.url);
-  // Solo recursos del mismo origen; la API de la NASA nunca se cachea aquí.
-  if (req.method !== 'GET' || url.origin !== self.location.origin) return;
+  // Solo recursos del mismo origen; las APIs externas nunca se cachean aquí. El APK tampoco (es una descarga grande).
+  if (req.method !== 'GET' || url.origin !== self.location.origin || url.pathname.endsWith('.apk')) return;
   // Red primero (siempre la versión más nueva); si no hay conexión, se usa la copia guardada.
   event.respondWith(
     fetch(req)

@@ -1,7 +1,7 @@
 {
   "name": "AstroVital · Órbita / Bienestar",
   "short_name": "AstroVital",
-  "description": "Seguimiento visual del estado de salud de un astronauta con datos abiertos de la NASA. Uso educativo, no clínico.",
+  "description": "Seguimiento visual del estado de salud de un astronauta con datos abiertos. Uso educativo, no clínico.",
   "lang": "es",
   "start_url": "./index.html",
   "scope": "./",

@@ -1,6 +1,6 @@
 # References and credits (English)
 
-## Open NASA data
+## Open data
 
 | Use | Source | Notes |
 | --- | --- | --- |

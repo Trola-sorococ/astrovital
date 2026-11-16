@@ -30,7 +30,7 @@ import java.util.Date
 import java.util.Locale
 import kotlin.random.Random
 
-/** Aplicación de bienestar conectada a JSON y a la API pública NASA DONKI. */
+/** Aplicación de bienestar conectada a JSON y a la API pública DONKI. */
 class MainActivity : Activity() {
     // Paleta de negro profundo y grises claros para dar una sensación de cristal ahumado.
     private val ink = Color.rgb(245, 246, 248)
@@ -114,7 +114,7 @@ class MainActivity : Activity() {
         content.addView(chip("◷   SEGUIMIENTO DE MISIÓN"), top(12))
         // La figura GLB se carga desde los assets del APK para funcionar sin internet.
         content.addView(personPreview(), top(14))
-        content.addView(sectionTitle("Fuentes conectadas", "JSON + NASA DONKI"), top(20))
+        content.addView(sectionTitle("Fuentes conectadas", "JSON + DONKI"), top(20))
         content.addView(dataOverviewCard(), top(10))
 
         content.addView(sectionTitle("¿Cómo te sientes?", "GUARDADO EN EL TELÉFONO"), top(20))
@@ -252,7 +252,7 @@ class MainActivity : Activity() {
         content.addView(missionEffectsCard(), top(8))
         content.addView(actionButton("Importar archivo JSON"), top(12))
         (content.getChildAt(content.childCount - 1) as Button).setOnClickListener { importJsonFile() }
-        content.addView(actionButton("Actualizar datos NASA ahora"), top(8))
+        content.addView(actionButton("Actualizar datos ahora"), top(8))
         (content.getChildAt(content.childCount - 1) as Button).setOnClickListener { refreshSolarFlares(true) }
     }
 
@@ -276,7 +276,7 @@ class MainActivity : Activity() {
         val rad = sourceJson.opt("radiation_uSv_h")
         val co2 = sourceJson.opt("cabin_co2_mmHg")
         val quality = sourceJson.optJSONObject("_quality") ?: JSONObject()
-        addView(text("NASA DONKI · llamaradas solares (últimos 30 días)", 12, ink, true))
+        addView(text("DONKI · llamaradas solares (últimos 30 días)", 12, ink, true))
         addView(text(if (flareDataKnown) "$flareStatus · ${flareJson.length()} eventos en respuesta API guardada" else "$flareStatus · no hay respuesta válida; cero eventos no confirmado", 10, mint), top(5))
         for (i in 0 until minOf(3, flareJson.length())) {
             val event = flareJson.optJSONObject(i) ?: continue
@@ -288,7 +288,7 @@ class MainActivity : Activity() {
         addView(text("Los valores provisionales se muestran como referencia, nunca como mediciones confirmadas.", 9, muted), top(8))
         addView(actionButton("Importar / reemplazar JSON"), top(10))
         (getChildAt(childCount - 1) as Button).setOnClickListener { importJsonFile() }
-        addView(actionButton("Actualizar NASA DONKI"), top(7))
+        addView(actionButton("Actualizar DONKI"), top(7))
         (getChildAt(childCount - 1) as Button).setOnClickListener { refreshSolarFlares(true) }
     }
 
@@ -325,11 +325,11 @@ class MainActivity : Activity() {
         )
         if (!rad.isNaN() && flareDataKnown) {
             val heart = minOf(1.0, (rad / 50.0) * .4 + flareJson.length() * .05 + .1)
-            addView(text("Corazón: ${formatValue(heart * 100, 1)} % de índice estimado · NASA ${flareJson.length()} eventos", 10, ink), top(8))
-        } else addView(text("Índice cardíaco: pendiente · necesita radiación y respuesta válida de NASA DONKI.", 10, muted), top(8))
+            addView(text("Corazón: ${formatValue(heart * 100, 1)} % de índice estimado · ${flareJson.length()} eventos", 10, ink), top(8))
+        } else addView(text("Índice cardíaco: pendiente · necesita radiación y respuesta válida de DONKI.", 10, muted), top(8))
         addMissionGuidance(
             "Radiación · cómo interpretar",
-            "El JSON informa ${if (rad.isNaN()) "sin tasa disponible" else "$rad µSv/h"}${if (provisional) " como valor provisional" else ""}. NASA DONKI aporta eventos de llamaradas, no la dosis de la tripulación. Para valorar exposición se requiere una fuente de dosimetría validada y su periodo de medición; esta pantalla no calcula dosis acumulada observada ni recomienda tratamiento. Si el dato es provisional o falta, confirmar con el equipo de protección radiológica."
+            "El JSON informa ${if (rad.isNaN()) "sin tasa disponible" else "$rad µSv/h"}${if (provisional) " como valor provisional" else ""}. DONKI aporta eventos de llamaradas, no la dosis de la tripulación. Para valorar exposición se requiere una fuente de dosimetría validada y su periodo de medición; esta pantalla no calcula dosis acumulada observada ni recomienda tratamiento. Si el dato es provisional o falta, confirmar con el equipo de protección radiológica."
         )
         addMissionGuidance(
             "Clima espacial · respuesta operativa",
@@ -361,7 +361,7 @@ class MainActivity : Activity() {
         startActivityForResult(intent, 4103)
     }
 
-    /** Consulta la API real de NASA DONKI FLR y conserva la última respuesta para usar sin internet. */
+    /** Consulta la API real de DONKI FLR y conserva la última respuesta para usar sin internet. */
     private fun refreshSolarFlares(showToast: Boolean = false) {
         io.execute {
             try {
@@ -423,7 +423,7 @@ class MainActivity : Activity() {
                 }, top(8))
             }
         }
-        content.addView(text("NASA DONKI: ${if (flareDataKnown) "${flareJson.length()} eventos en la última respuesta válida" else "sin respuesta válida"} · $flareStatus", 10, mint), top(18))
+        content.addView(text("DONKI: ${if (flareDataKnown) "${flareJson.length()} eventos en la última respuesta válida" else "sin respuesta válida"} · $flareStatus", 10, mint), top(18))
     }
 
     /** Ficha independiente para que cada etapa muestre sus resultados y sus escaneos guardados. */
@@ -453,7 +453,7 @@ class MainActivity : Activity() {
                 addView(text("Frecuencia cardíaca: ${vitals.optInt("hr")} lpm", 11, ink), top(8))
                 addView(text("Oxígeno: ${vitals.optInt("spo2")}% · Temperatura: ${vitals.optDouble("temp")} °C", 11, ink), top(4))
                 addView(text("Sueño (dato demo): ${vitals.optDouble("sleep")} h · Estrés (dato demo): ${vitals.optInt("stress")}/100", 10, muted), top(4))
-                addView(text("NASA DONKI al guardar: ${displayed.optInt("solarFlares", -1).let { if (it < 0) "sin respuesta válida" else "$it eventos" }}", 10, muted), top(7))
+                addView(text("DONKI al guardar: ${displayed.optInt("solarFlares", -1).let { if (it < 0) "sin respuesta válida" else "$it eventos" }}", 10, muted), top(7))
                 addView(text("Radiación JSON: ${displayed.optString("radiation", "sin dato")} · CO₂: ${displayed.optString("co2", "sin dato")}", 10, muted), top(4))
                 addView(text("JSON ${displayed.optString("jsonGenerated", "sin fecha")} · Calidad radiación: ${displayed.optString("radiationQuality", "sin nota")} · CO₂: ${displayed.optString("co2Quality", "sin nota")}", 9, muted), top(4))
                 if (selectedPhase == "after") addView(text("Efectos acumulados estimados: ${displayed.optString("effects", "pendientes")}", 10, mint), top(7))
@@ -528,9 +528,9 @@ class MainActivity : Activity() {
             } else effects.add("pendientes: ingresa duración total en Perfil")
             if (rad != null && flareDataKnown) {
                 val heartIndex = minOf(1.0, (rad.toDouble() / 50.0) * .4 + flareJson.length() * .05 + .1)
-                effects.add("índice cardíaco experimental ${formatValue(heartIndex * 100, 1)}% · NASA ${flareJson.length()} eventos")
+                effects.add("índice cardíaco experimental ${formatValue(heartIndex * 100, 1)}% · ${flareJson.length()} eventos")
                 if (heartIndex >= .30) mark("heart")
-            } else effects.add("índice cardíaco pendiente: falta radiación o respuesta NASA válida")
+            } else effects.add("índice cardíaco pendiente: falta radiación o respuesta válida")
         }
         val scan = JSONObject().put("time", System.currentTimeMillis()).put("title", title).put("stage", stage)
             .put("stageLabel", when { stage == "before" -> "Antes del viaje"; stage == "after" -> "Después del viaje"; else -> "Durante la misión" })

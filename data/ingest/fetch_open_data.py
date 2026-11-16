@@ -1,4 +1,4 @@
-"""Update compact NASA inputs using requests and the team JSON contract."""
+"""Update compact open-data inputs using requests and the team JSON contract."""
 from __future__ import annotations
 import datetime as dt
 import json
@@ -76,7 +76,7 @@ def main():
     today=dt.datetime.now(dt.timezone.utc).date()
     start=today-dt.timedelta(days=30)
     s=requests.Session()
-    s.headers["User-Agent"]="AstroVital NASA data ingestion"
+    s.headers["User-Agent"]="AstroVital open data ingestion"
     flares,flare_error=get_flares(s,start,today)
     osdr_sources,osdr_error=get_osdr_sources(s)
     radiation,radiation_status,radiation_error=get_radiation(s,start,today+dt.timedelta(days=1))
