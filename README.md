@@ -6,6 +6,8 @@ Aplicación web instalable (PWA) y app Android para seguir de forma visual el es
 
 **Demo en línea (sin registro):** <https://trola-sorococ.github.io/astrovital/>
 
+**Presentación:** <https://canva.link/1wiybgnzjpgqzbb>
+
 > Proyecto educativo. Los signos vitales son simulados y el modelo de riesgo es experimental: no es un dispositivo médico ni ofrece diagnóstico.
 
 ## Qué incluye
@@ -42,6 +44,7 @@ python -m http.server 8000
 ## Entrega NASA Space Apps
 
 - Título, resumen, explicación detallada, uso de datos NASA y declaración: [`docs/ENTREGA_NASA_SPACE_APPS.md`](docs/ENTREGA_NASA_SPACE_APPS.md)
+- Texto del formulario en inglés: [`docs/SUBMISSION_FORM_EN.md`](docs/SUBMISSION_FORM_EN.md)
 - Referencias y créditos: [`docs/REFERENCIAS.md`](docs/REFERENCIAS.md)
 
 ## Datos NASA utilizados

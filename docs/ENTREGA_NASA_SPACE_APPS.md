@@ -41,8 +41,10 @@ AstroVital es una aplicación web instalable (PWA) y una app Android que muestra
 
 ## 4. Demostración visual (elegir una)
 
-- Video de hasta 30 s (YouTube/Vimeo, enlace público): **[COMPLETAR]**
-- O presentación de máximo 7 láminas (enlace público): **[COMPLETAR]**
+- Presentación de máximo 7 láminas (enlace público): <https://canva.link/1wiybgnzjpgqzbb>
+- O video de hasta 30 s (YouTube/Vimeo, enlace público): **[COMPLETAR, solo si usan video]**
+
+El formulario oficial exige todos los campos en inglés: ver [`SUBMISSION_FORM_EN.md`](SUBMISSION_FORM_EN.md).
 
 Guion sugerido para 30 s: (0–5 s) problema y nombre; (5–15 s) escaneo → modelo 3D con zonas rojas/verdes; (15–23 s) datos NASA en vivo (DONKI) y efectos acumulados; (23–30 s) instalación sin conexión y aviso de uso no clínico.
 
