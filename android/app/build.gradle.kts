@@ -14,13 +14,13 @@ android {
         targetSdk = 34
         versionCode = 7
         versionName = "0.7.0"
+    }
 
     // Kotlin y Java compilan para la misma versión de bytecode requerida por Android Gradle Plugin.
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    }
 
-kotlinOptions { jvmTarget = "17" }
+    kotlinOptions { jvmTarget = "17" }
 }

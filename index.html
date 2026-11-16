@@ -4,12 +4,18 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Órbita / Bienestar | AstroVital</title>
+  <meta name="description" content="AstroVital: seguimiento visual del estado de salud de un astronauta con datos abiertos de la NASA (DONKI, OSDR, RadLab). Uso educativo, no clínico." />
+  <meta name="theme-color" content="#050505" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" type="image/png" href="assets/icon-192.png" />
+  <link rel="apple-touch-icon" href="assets/icon-192.png" />
   <link rel="stylesheet" href="ui/styles.css" />
+  <!-- Three.js se sirve desde vendor/ (copia local) para que la app funcione sin internet -->
   <script type="importmap">
     {
       "imports": {
-        "three": "https://unpkg.com/three@0.170.0/build/three.module.js",
-        "three/addons/": "https://unpkg.com/three@0.170.0/examples/jsm/"
+        "three": "./vendor/three/build/three.module.js",
+        "three/addons/": "./vendor/three/examples/jsm/"
       }
     }
   </script>
@@ -108,23 +114,19 @@
             <div class="card-header">
               <div>
                 <h2>Fuentes conectadas</h2>
-                <p class="card-sub">API de clima espacial · llamaradas solares (últimos 30 días)</p>
+                <p class="card-sub">NASA DONKI · llamaradas solares (últimos 30 días) + OSDR</p>
               </div>
               <span class="tag-pill">JSON + API en línea</span>
             </div>
 
             <div class="telemetry-log-box">
-              <p class="log-highlight" id="api-updated-text">API actualizada · 14 eventos en respuesta API guardada</p>
-              <ul class="flare-list" id="flare-list">
-                <li>• 2026-10-16T15:38Z · clase M1.3</li>
-                <li>• 2026-10-19T08:54Z · clase M1.6</li>
-                <li>• 2026-10-23T03:43Z · clase C1.3</li>
-              </ul>
-              <p class="log-muted" id="json-status-text">JSON · fecha 2026-11-13T18:00:00-06:00 · estado: JSON incluido con la aplicación</p>
-              <p class="log-muted">Radiación DosTel: 28.303083 µGy/h · referencia histórica (2023-01-01)</p>
+              <p class="log-highlight" id="api-updated-text">Consultando NASA DONKI…</p>
+              <ul class="flare-list" id="flare-list"></ul>
+              <p class="log-muted" id="json-status-text">JSON · cargando data/risk_inputs.json…</p>
+              <p class="log-muted">Radiación DosTel (OSDR RadLab): 28.303083 µGy/h · referencia histórica (2023-01-01)</p>
               <p class="log-muted">No equivale a µSv/h ni representa exposición actual de la tripulación.</p>
               <p class="log-muted">CO₂ cabina: sin dato · no incluido en este JSON</p>
-              <p class="log-muted">Llamaradas DONKI: sin dato (unavailable) · no se asume cero</p>
+              <p class="log-muted" id="donki-status-text">Llamaradas DONKI: consultando… · no se asume cero si falla la consulta</p>
               <p id="latest-scan-red-note" class="log-alert-note"></p>
             </div>
 
@@ -274,8 +276,8 @@
 
             <div class="telemetry-log-box">
               <p class="log-muted">Hueso (columna): pendiente · falta radiación válida</p>
-              <p class="log-highlight" id="cumulative-femur">Hueso (fémur): 84.0% de índice estimado</p>
-              <p class="log-highlight" id="cumulative-muscle">Músculo (piernas): 100.0% de índice estimado</p>
+              <p class="log-highlight" id="cumulative-femur">Hueso (fémur): calculando…</p>
+              <p class="log-highlight" id="cumulative-muscle">Músculo (piernas): calculando…</p>
             </div>
 
             <div class="accordion-list">
@@ -371,6 +373,17 @@
         <button type="submit" class="primary-btn">Guardar perfil en este dispositivo</button>
         <p id="profile-feedback" class="disclaimer-text">Los datos del perfil son informativos y no sustituyen una evaluación clínica.</p>
       </form>
+      <article class="card">
+        <h2>Créditos y datos NASA</h2>
+        <p class="card-sub">
+          Datos abiertos: <a href="https://ccmc.gsfc.nasa.gov/tools/DONKI/" target="_blank" rel="noopener">NASA DONKI</a> (llamaradas solares),
+          <a href="https://osdr.nasa.gov/bio/" target="_blank" rel="noopener">NASA OSDR</a> (estudios OSD-980 y OSD-781) y
+          <a href="https://visualization.osdr.nasa.gov/radlab/" target="_blank" rel="noopener">OSDR RadLab</a> (dosimetría DosTel ISS).
+          Visor 3D con <a href="https://threejs.org/" target="_blank" rel="noopener">Three.js</a> (MIT).
+          Referencias completas en <a href="docs/REFERENCIAS.md" target="_blank" rel="noopener">docs/REFERENCIAS.md</a>.
+        </p>
+        <p class="disclaimer-text">Proyecto educativo del equipo ZeroG-Pulse (NASA Space Apps Challenge). No es un dispositivo médico ni sustituye una evaluación clínica.</p>
+      </article>
     </section>
   </div>
 
@@ -382,7 +395,7 @@
         <button type="button" class="modal-option-btn" data-stage-choice="before" data-label="Escaneo inicial · antes del viaje">
           Escaneo inicial · antes del viaje
         </button>
-        <button type="button" class="modal-option-btn" data-stage-choice="before" data-label="Escaneo al salir del planeta">
+        <button type="button" class="modal-option-btn" data-stage-choice="during" data-label="Escaneo al salir del planeta">
           Escaneo al salir del planeta
         </button>
         <button type="button" class="modal-option-btn" data-stage-choice="during" data-label="Nuevo escaneo durante la estancia">

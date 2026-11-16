@@ -2,6 +2,12 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
+import { calcularRiesgo } from '../model/risk.js';
+
+// Escapa texto antes de insertarlo con innerHTML (los registros viven en localStorage).
+function esc(value) {
+  return String(value ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+}
 
 // ==================== 1. CATÁLOGO DE 14 SITUACIONES (IGUAL A APK) ====================
 const SITUATIONS = [
@@ -30,13 +36,13 @@ const SITUATIONS = [
   },
   {
     name: 'Exposición a radiación espacial',
-    zones: ['heart', 'bone_spine', 'bone_left_femur', 'bone_right_femur'],
+    zones: ['heart', 'brain', 'bone_spine', 'bone_left_femur', 'bone_right_femur'],
     zoneLabels: ['esqueleto (referencia visual a tejidos formadores de sangre)', 'corazón y vasos (referencia visual)', 'cerebro/SNC (referencia visual)'],
     effectNote: 'Exposición acumulada a radiación cósmica galáctica y partículas solares.'
   },
   {
     name: 'Aumento de CO₂ en cabina',
-    zones: ['heart', 'bone_spine', 'bone_left_femur', 'bone_right_femur'],
+    zones: ['lungs', 'bone_spine', 'bone_left_femur', 'bone_right_femur'],
     zoneLabels: ['pulmones', 'esqueleto (referencia visual a tejidos formadores de sangre)', 'extremidades (referencia visual del esqueleto)'],
     effectNote: 'Elevación leve de presión parcial de CO₂; compensación respiratoria y cardiovascular.'
   },
@@ -53,7 +59,7 @@ const SITUATIONS = [
   },
   {
     name: 'Fuga de CO₂ en cabina',
-    zones: ['heart', 'bone_spine', 'bone_left_femur', 'bone_right_femur'],
+    zones: ['lungs', 'bone_spine', 'bone_left_femur', 'bone_right_femur'],
     zoneLabels: ['pulmones', 'esqueleto (referencia visual a tejidos formadores de sangre)', 'extremidades (referencia visual del esqueleto)'],
     effectNote: 'Variación crítica de atmósfera interna; revisión inmediata de depuradores.'
   },
@@ -77,7 +83,7 @@ const SITUATIONS = [
   },
   {
     name: 'Dosimetría de radiación',
-    zones: ['heart', 'bone_spine', 'bone_left_femur', 'bone_right_femur'],
+    zones: ['heart', 'brain', 'bone_spine', 'bone_left_femur', 'bone_right_femur'],
     zoneLabels: ['esqueleto (referencia visual a tejidos formadores de sangre)', 'corazón y vasos (referencia visual)', 'cerebro/SNC (referencia visual)'],
     effectNote: 'La dosimetría requiere lecturas y periodo de exposición; el dato DosTel disponible es histórico.'
   },
@@ -151,6 +157,8 @@ const nodes = {
   bone_spine: [],
   bone_left_femur: [],
   bone_right_femur: [],
+  lungs: [],
+  brain: [],
   other: []
 };
 
@@ -169,6 +177,8 @@ function assignNodeMaterials(root) {
       if (name === 'bone_spine') { matchedKey = 'bone_spine'; break; }
       if (name === 'bone_left_femur') { matchedKey = 'bone_left_femur'; break; }
       if (name === 'bone_right_femur') { matchedKey = 'bone_right_femur'; break; }
+      if (name === 'lungs') { matchedKey = 'lungs'; break; }
+      if (name === 'brain' || name === 'brain_') { matchedKey = 'brain'; break; }
       if (name === 'body') { matchedKey = 'body'; break; }
       current = current.parent;
     }
@@ -209,7 +219,7 @@ function applyZoneHighlights(alertZones) {
   const GREEN = 0x00e699;
   const RED = 0xff3b30;
 
-  ['body', 'heart', 'bone_spine', 'bone_left_femur', 'bone_right_femur', 'other'].forEach((key) => {
+  ['body', 'heart', 'bone_spine', 'bone_left_femur', 'bone_right_femur', 'lungs', 'brain', 'other'].forEach((key) => {
     const isAlert = alertZones.includes(key);
     const hex = isAlert ? RED : GREEN;
     nodes[key].forEach((mesh) => {
@@ -222,7 +232,8 @@ function applyZoneHighlights(alertZones) {
 }
 
 const dracoLoader = new DRACOLoader();
-dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.7/');
+// Decodificador Draco local (vendor/) para funcionar sin conexión
+dracoLoader.setDecoderPath('vendor/three/examples/jsm/libs/draco/gltf/');
 
 const gltfLoader = new GLTFLoader();
 gltfLoader.setDRACOLoader(dracoLoader);
@@ -433,16 +444,16 @@ function renderHistory() {
     .map((item) => {
       const hasAlerts = item.zoneLabels && item.zoneLabels.length > 0;
       const statusHtml = hasAlerts
-        ? `<div class="history-status-alert">● Zonas marcadas: ${item.zoneLabels.join(', ')}</div>`
+        ? `<div class="history-status-alert">● Zonas marcadas: ${esc(item.zoneLabels.join(', '))}</div>`
         : `<div class="history-status-ok">● Estado estable · sin zonas marcadas</div>`;
 
       return `
         <article class="history-card">
-          <h3>${item.title}</h3>
-          <div class="history-meta">${item.timestamp} · ${item.stageLabel}</div>
-          <div class="history-situation">Situación: ${item.situation}</div>
+          <h3>${esc(item.title)}</h3>
+          <div class="history-meta">${esc(item.timestamp)} · ${esc(item.stageLabel)}</div>
+          <div class="history-situation">Situación: ${esc(item.situation)}</div>
           ${statusHtml}
-          <div class="history-telemetry">FC ${item.bpm} lpm · SpO₂ ${item.spo2}% · Temp. ${item.temp} °C</div>
+          <div class="history-telemetry">FC ${esc(item.bpm)} lpm · SpO₂ ${esc(item.spo2)}% · Temp. ${esc(item.temp)} °C (simulado)</div>
         </article>
       `;
     })
@@ -476,25 +487,25 @@ function openStageDetail(stageKey) {
     applyZoneHighlights(latest.alertZones || []);
     const hasAlerts = latest.zoneLabels && latest.zoneLabels.length > 0;
     latestCard.innerHTML = `
-      <h2>${latest.title}</h2>
-      <div class="history-meta">${latest.timestamp} · registro local</div>
-      <div class="history-situation"><strong>Situación evaluada:</strong> ${latest.situation} · simulación</div>
-      <p class="card-sub">${latest.effectNote}</p>
+      <h2>${esc(latest.title)}</h2>
+      <div class="history-meta">${esc(latest.timestamp)} · registro local</div>
+      <div class="history-situation"><strong>Situación evaluada:</strong> ${esc(latest.situation)} · simulación</div>
+      <p class="card-sub">${esc(latest.effectNote)}</p>
       ${hasAlerts
-        ? `<div class="history-status-alert">● Zonas destacadas por simulación: ${latest.zoneLabels.join(', ')}</div>`
+        ? `<div class="history-status-alert">● Zonas destacadas por simulación: ${esc(latest.zoneLabels.join(', '))}</div>`
         : `<div class="history-status-ok">● Indicadores simulados estables · sin zonas marcadas</div>`
       }
-      <div class="history-telemetry">Frecuencia cardíaca: ${latest.bpm} lpm · Oxígeno: ${latest.spo2}% · Temperatura: ${latest.temp} °C</div>
-      <div class="history-telemetry">Sueño (dato demo): ${latest.sleep} h · Estrés (dato demo): ${latest.stress}/100</div>
+      <div class="history-telemetry">Frecuencia cardíaca: ${esc(latest.bpm)} lpm · Oxígeno: ${esc(latest.spo2)}% · Temperatura: ${esc(latest.temp)} °C (datos simulados)</div>
+      <div class="history-telemetry">Sueño (dato demo): ${esc(latest.sleep)} h · Estrés (dato demo): ${esc(latest.stress)}/100</div>
     `;
 
     recordsList.innerHTML = history
       .map(
         (r) => `
         <div class="history-card">
-          <h3>${r.title}</h3>
-          <div class="history-meta">${r.timestamp} · ${r.zoneLabels.length > 0 ? 'con zonas marcadas' : 'estable'}</div>
-          <div class="history-situation">Situación: ${r.situation}</div>
+          <h3>${esc(r.title)}</h3>
+          <div class="history-meta">${esc(r.timestamp)} · ${(r.zoneLabels || []).length > 0 ? 'con zonas marcadas' : 'estable'}</div>
+          <div class="history-situation">Situación: ${esc(r.situation)}</div>
         </div>
       `
       )
@@ -549,33 +560,110 @@ document.querySelectorAll('.mood-btn').forEach((btn) => {
 
 document.getElementById('btn-save-mood').addEventListener('click', () => {
   const note = document.getElementById('mood-note').value.trim();
-  localStorage.setItem('astrovital_mood_v1', JSON.stringify({ mood: selectedMood, note }));
+  localStorage.setItem(MOOD_KEY, JSON.stringify({ mood: selectedMood, note }));
   document.getElementById('mood-feedback').textContent = `✓ Guardado: ${selectedMood}${note ? ` — "${note}"` : ''}`;
   showToast('Estado de ánimo guardado en este dispositivo');
 });
 
-async function refreshSpaceWeather() {
-  const now = new Date();
-  const stamp = `${now.toLocaleDateString('es-GT')} ${now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+const MOOD_KEY = 'astrovital_mood_v1';
+function restoreMood() {
   try {
-    const res = await fetch('data/nasa_space_weather.json');
-    if (res.ok) {
-      const json = await res.json();
-      document.getElementById('api-updated-text').textContent =
-        `API actualizada ${stamp} · ${json.events_count || 14} eventos en respuesta guardada`;
-    } else {
-      document.getElementById('api-updated-text').textContent =
-        `API actualizada ${stamp} · 14 eventos en respuesta API guardada`;
-    }
+    const saved = JSON.parse(localStorage.getItem(MOOD_KEY) || 'null');
+    if (!saved || !saved.mood) return;
+    selectedMood = saved.mood;
+    document.querySelectorAll('.mood-btn').forEach((b) => b.classList.toggle('active', b.dataset.mood === selectedMood));
+    document.getElementById('mood-note').value = saved.note || '';
+    document.getElementById('mood-feedback').textContent = `Estado actual: ${selectedMood}`;
   } catch {
-    document.getElementById('api-updated-text').textContent =
-      `API actualizada ${stamp} · 14 eventos en respuesta API guardada`;
+    // Registro dañado: se ignora
   }
-  showToast('Datos de clima espacial actualizados');
 }
 
-document.getElementById('btn-refresh-api').addEventListener('click', refreshSpaceWeather);
-document.getElementById('btn-refresh-cumulative').addEventListener('click', refreshSpaceWeather);
+// --- Datos de entrada del modelo (data/risk_inputs.json, incluido con la app) ---
+let riskInputs = null;
+
+async function loadRiskInputs() {
+  const statusEl2 = document.getElementById('json-status-text');
+  try {
+    const res = await fetch('data/risk_inputs.json', { cache: 'no-cache' });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    riskInputs = await res.json();
+    statusEl2.textContent =
+      `JSON · generado ${riskInputs.generated || 'sin fecha'} · estado: incluido con la aplicación · misión, radiación y CO₂ provisionales`;
+  } catch {
+    riskInputs = null;
+    statusEl2.textContent = 'JSON · no disponible (sin datos de entrada) · no se inventan valores';
+  }
+  updateCumulativeEffects();
+}
+
+// --- Llamaradas solares en vivo: NASA DONKI (CCMC), últimos 30 días ---
+const FLARES_CACHE_KEY = 'astrovital_flares_v1';
+let latestFlares = null; // null = sin dato; [] = consulta válida sin eventos
+
+function isoDay(date) {
+  return date.toISOString().slice(0, 10);
+}
+
+function renderFlares(flares, statusText, cachedAt) {
+  const listEl = document.getElementById('flare-list');
+  const donkiEl = document.getElementById('donki-status-text');
+  listEl.innerHTML = '';
+  if (Array.isArray(flares) && flares.length > 0) {
+    [...flares]
+      .sort((a, b) => String(b.beginTime).localeCompare(String(a.beginTime)))
+      .slice(0, 5)
+      .forEach((f) => {
+        const li = document.createElement('li');
+        li.textContent = `• ${f.beginTime} · clase ${f.classType}`;
+        listEl.appendChild(li);
+      });
+  }
+  if (Array.isArray(flares)) {
+    donkiEl.textContent = `Llamaradas DONKI: ${flares.length} evento(s) en 30 días${cachedAt ? ` · caché del ${cachedAt}` : ''}`;
+  } else {
+    donkiEl.textContent = 'Llamaradas DONKI: sin dato (unavailable) · no se asume cero';
+  }
+  document.getElementById('api-updated-text').textContent = statusText;
+}
+
+async function refreshSpaceWeather(manual = true) {
+  const now = new Date();
+  const stamp = `${now.toLocaleDateString('es-GT')} ${now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+  const url = `https://ccmc.gsfc.nasa.gov/DONKI-API/get/FLR?startDate=${isoDay(new Date(now.getTime() - 30 * 86400000))}&endDate=${isoDay(now)}`;
+  try {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    if (!Array.isArray(data)) throw new Error('Respuesta DONKI inesperada');
+    const flares = data
+      .filter((f) => f && f.beginTime && f.classType)
+      .map((f) => ({ beginTime: f.beginTime, classType: f.classType }));
+    latestFlares = flares;
+    localStorage.setItem(FLARES_CACHE_KEY, JSON.stringify({ at: stamp, flares }));
+    renderFlares(flares, `API NASA DONKI actualizada ${stamp} · ${flares.length} llamaradas en los últimos 30 días`);
+    if (manual) showToast('Datos de clima espacial actualizados');
+  } catch {
+    let cached = null;
+    try {
+      cached = JSON.parse(localStorage.getItem(FLARES_CACHE_KEY) || 'null');
+    } catch {
+      cached = null;
+    }
+    if (cached && Array.isArray(cached.flares)) {
+      latestFlares = cached.flares;
+      renderFlares(cached.flares, `Sin conexión con DONKI · mostrando la última respuesta válida (${cached.at})`, cached.at);
+    } else {
+      latestFlares = null;
+      renderFlares(null, 'Sin conexión con DONKI · sin respuesta guardada');
+    }
+    if (manual) showToast('No se pudo consultar DONKI; se muestra el último dato guardado');
+  }
+  updateCumulativeEffects();
+}
+
+document.getElementById('btn-refresh-api').addEventListener('click', () => refreshSpaceWeather(true));
+document.getElementById('btn-refresh-cumulative').addEventListener('click', () => refreshSpaceWeather(true));
 
 // ==================== 9. SIGNOS VITALES CADA 4 SEGUNDOS ====================
 function refreshLiveVitals() {
@@ -603,17 +691,29 @@ setInterval(refreshLiveVitals, 4000);
 // ==================== 10. PERFIL DEL TRIPULANTE ====================
 const PROFILE_KEY = 'astrovital_crew_profile_v1';
 
-function applyProfileToUI(profile) {
-  const name = (profile.name || '').trim();
-  const duration = Number(profile.duration) || 180;
+let currentProfile = {};
 
-  document.getElementById('greeting-title').textContent = name ? `Hola, ${name}` : 'Hola, tripulante';
+// Efectos acumulados: se calculan con model/risk.js (modelo experimental, no clínico).
+function updateCumulativeEffects() {
+  const duration = Math.max(1, Number(currentProfile.duration) || 180);
   document.getElementById('cumulative-horizon').textContent = `Horizonte: ${duration} días · duración fija del perfil`;
 
-  const femurRisk = Math.min(100, (duration / 428) * 100).toFixed(1);
-  const muscleRisk = Math.min(100, (duration / 300) * 100).toFixed(1);
-  document.getElementById('cumulative-femur').textContent = `Hueso (fémur): ${femurRisk}% de índice estimado`;
-  document.getElementById('cumulative-muscle').textContent = `Músculo (piernas): ${muscleRisk}% de índice estimado`;
+  const risk = calcularRiesgo({
+    mission_day: duration,
+    radiation_uSv_h: riskInputs ? riskInputs.radiation_uSv_h : undefined,
+    solar_flares_30d: latestFlares || []
+  });
+  document.getElementById('cumulative-femur').textContent =
+    `Hueso (fémur): ${(risk.bone_femur.risk * 100).toFixed(1)}% de índice estimado`;
+  document.getElementById('cumulative-muscle').textContent =
+    `Músculo (piernas): ${(risk.muscle_legs.risk * 100).toFixed(1)}% de índice estimado`;
+}
+
+function applyProfileToUI(profile) {
+  currentProfile = profile || {};
+  const name = (currentProfile.name || '').trim();
+  document.getElementById('greeting-title').textContent = name ? `Hola, ${name}` : 'Hola, tripulante';
+  updateCumulativeEffects();
 }
 
 function loadProfile() {
@@ -650,8 +750,16 @@ document.getElementById('profile-form').addEventListener('submit', (e) => {
 });
 
 loadProfile();
+restoreMood();
 updateHomeStageSummaries();
 renderHistory();
+loadRiskInputs();
+refreshSpaceWeather(false);
+
+// PWA: permite instalar la app y usarla sin conexión
+if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+}
 
 // ==================== 11. ANIMACIÓN Y RESIZE ====================
 const clock = new THREE.Clock();

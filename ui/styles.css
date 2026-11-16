@@ -684,3 +684,9 @@ body {
 .nav-btn.active {
   color: var(--text-primary);
 }
+
+/* Enlaces */
+a {
+  color: var(--accent-mint);
+}
+

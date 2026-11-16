@@ -2,18 +2,17 @@
 from __future__ import annotations
 import datetime as dt
 import json
-import os
 from pathlib import Path
 import requests
 
 ROOT=Path(__file__).resolve().parents[2]
 DATA=ROOT/"data"
 RAW=DATA/"flares_raw.json"
-DONKI="https://api.nasa.gov/DONKI/FLR"
+# api.nasa.gov/DONKI/FLR devuelve HTTP 404; el endpoint público vigente es el de CCMC (no requiere clave).
+DONKI="https://ccmc.gsfc.nasa.gov/DONKI-API/get/FLR"
 OSDR="https://visualization.osdr.nasa.gov/biodata/api/v2/query/assays/"
 RADLAB="https://visualization.osdr.nasa.gov/radlab/api/"
 EDA="https://visualization.osdr.nasa.gov/eda/"
-KEY=os.getenv("NASA_API_KEY","DEMO_KEY")
 TIMEOUT=30
 STUDIES=["https://osdr.nasa.gov/bio/repo/data/studies/OSD-980","https://osdr.nasa.gov/bio/repo/data/studies/OSD-781"]
 
@@ -26,7 +25,7 @@ def records(payload):
 
 def get_flares(session,start,end):
     try:
-        r=session.get(DONKI,params={"startDate":start.isoformat(),"endDate":end.isoformat(),"api_key":KEY},timeout=TIMEOUT)
+        r=session.get(DONKI,params={"startDate":start.isoformat(),"endDate":end.isoformat()},timeout=TIMEOUT)
         r.raise_for_status()
         raw=r.json()
         if not isinstance(raw,list):
