@@ -1,6 +1,6 @@
 # AstroVital · Órbita / Bienestar
 
-Equipo **ZeroG-Pulse** · NASA Space Apps Challenge
+Equipo **ZeroG-Pulse** · Space Apps Challenge
 
 Aplicación web instalable (PWA) y app Android para seguir de forma visual el estado de bienestar de un astronauta antes, durante y después de una misión, usando datos abiertos de la NASA.
 
@@ -41,17 +41,17 @@ python -m http.server 8000
 | `android/` | App Android (Kotlin) |
 | `docs/` | Entrega para NASA Space Apps y referencias |
 
-## Entrega NASA Space Apps
+## Entrega Space Apps Challenge
 
-- Título, resumen, explicación detallada, uso de datos NASA y declaración: [`docs/ENTREGA_NASA_SPACE_APPS.md`](docs/ENTREGA_NASA_SPACE_APPS.md)
+- Título, resumen, explicación detallada, uso de datos publicos y declaración: [`docs/ENTREGA_NASA_SPACE_APPS.md`](docs/ENTREGA_NASA_SPACE_APPS.md)
 - Texto del formulario en inglés: [`docs/SUBMISSION_FORM_EN.md`](docs/SUBMISSION_FORM_EN.md)
 - Referencias y créditos: [`docs/REFERENCIAS.md`](docs/REFERENCIAS.md)
 
-## Datos NASA utilizados
+## Datos Publicos utilizados
 
-- [NASA DONKI](https://ccmc.gsfc.nasa.gov/tools/DONKI/): llamaradas solares
-- [NASA OSDR RadLab](https://visualization.osdr.nasa.gov/radlab/): dosimetría DosTel (ISS)
-- [NASA OSDR](https://osdr.nasa.gov/bio/repo/data/studies/OSD-980): estudios OSD-980 y [OSD-781](https://osdr.nasa.gov/bio/repo/data/studies/OSD-781)
+- [DONKI](https://ccmc.gsfc.nasa.gov/tools/DONKI/): llamaradas solares
+- [OSDR RadLab](https://visualization.osdr.nasa.gov/radlab/): dosimetría DosTel (ISS)
+- [OSDR](https://osdr.nasa.gov/bio/repo/data/studies/OSD-980): estudios OSD-980 y [OSD-781](https://osdr.nasa.gov/bio/repo/data/studies/OSD-781)
 
 ## Licencia
 
