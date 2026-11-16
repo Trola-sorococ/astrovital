@@ -1,4 +1,4 @@
-# Entrega · NASA Space Apps Challenge
+# Entrega ·  Space Apps Challenge
 
 Contenido listo para copiar al formulario del equipo en la página oficial de NASA Space Apps. Los campos marcados con **[COMPLETAR]** dependen de datos que solo el equipo conoce.
 
