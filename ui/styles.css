@@ -1,8 +1,9 @@
 :root {
   --bg-page: #050505;
-  --bg-card: #111114;
-  --bg-box: #18181c;
-  --border-subtle: #26262c;
+  --bg-card: #121215;
+  --bg-box: #1a1a1f;
+  --bg-modal: #1e1e23;
+  --border-subtle: #282830;
   --text-primary: #f5f5f7;
   --text-secondary: #8e8e93;
   --accent-mint: #00e699;
@@ -22,15 +23,15 @@ body {
   background-color: var(--bg-page);
   color: var(--text-primary);
   min-height: 100vh;
-  padding: 18px 18px 92px; /* Espacio inferior para la barra de navegación */
+  padding: 16px 16px 88px;
 }
 
 .app-shell {
-  max-width: 1120px;
+  max-width: 1180px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 14px;
 }
 
 /* Header */
@@ -45,7 +46,7 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   font-weight: 700;
   letter-spacing: 1.4px;
 }
@@ -58,20 +59,20 @@ body {
 }
 
 .status-badge {
-  font-size: 0.74rem;
+  font-size: 0.72rem;
   color: var(--accent-mint);
   background: rgba(0, 230, 153, 0.08);
   border: 1px solid rgba(0, 230, 153, 0.25);
-  padding: 5px 11px;
+  padding: 4px 10px;
   border-radius: 999px;
 }
 
-/* Vistas por pestaña */
+/* Pestañas */
 .tab-view {
   display: none;
   flex-direction: column;
-  gap: 16px;
-  animation: fadeIn 0.18s ease;
+  gap: 14px;
+  animation: fadeIn 0.16s ease;
 }
 
 .tab-view.active {
@@ -84,9 +85,10 @@ body {
 }
 
 .mission-subtitle {
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   letter-spacing: 1.2px;
   color: var(--text-secondary);
+  text-transform: uppercase;
 }
 
 .greeting-block h1,
@@ -106,44 +108,53 @@ body {
 }
 
 .lead-text {
-  font-size: 0.92rem;
+  font-size: 0.9rem;
   color: var(--text-secondary);
   margin-top: 4px;
 }
 
 /* Barra Seguimiento de Misión */
 .mission-bar {
+  width: 100%;
   display: flex;
   align-items: center;
   gap: 10px;
   background-color: var(--bg-card);
   border: 1px solid var(--border-subtle);
   border-radius: 999px;
-  padding: 11px 18px;
-  font-size: 0.74rem;
+  padding: 11px 16px;
+  font-size: 0.73rem;
   font-weight: 600;
   letter-spacing: 1px;
   color: var(--text-secondary);
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.2s;
 }
 
-/* Grid Principal Inicio */
-.main-grid {
+.mission-bar:hover {
+  border-color: #484852;
+}
+
+/* Layout Responsivo: 2 columnas en PC, 1 columna móvil en celulares */
+.desktop-split-grid {
   display: grid;
-  grid-template-columns: 1.2fr 1fr;
+  grid-template-columns: 1.15fr 1fr;
   gap: 16px;
-  align-items: stretch;
+  align-items: start;
 }
 
 @media (max-width: 860px) {
-  .main-grid {
+  .desktop-split-grid {
     grid-template-columns: 1fr;
   }
 }
 
-.right-column {
+.split-left,
+.split-right {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 14px;
 }
 
 /* Tarjetas */
@@ -151,10 +162,10 @@ body {
   background-color: var(--bg-card);
   border: 1px solid var(--border-subtle);
   border-radius: 20px;
-  padding: 20px;
+  padding: 18px;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
 }
 
 .card-header {
@@ -165,25 +176,25 @@ body {
 }
 
 .card-header h2 {
-  font-size: 1.15rem;
+  font-size: 1.12rem;
   font-weight: 600;
 }
 
 .card-sub {
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   color: var(--text-secondary);
   margin-top: 2px;
   line-height: 1.4;
 }
 
 .tag-pill {
-  font-size: 0.68rem;
+  font-size: 0.66rem;
   font-weight: 600;
   letter-spacing: 0.8px;
   color: var(--text-secondary);
   background: var(--bg-box);
   border: 1px solid var(--border-subtle);
-  padding: 4px 10px;
+  padding: 4px 9px;
   border-radius: 999px;
   white-space: nowrap;
 }
@@ -193,7 +204,7 @@ body {
   background-color: #08080a;
   border: 1px solid #1e1e24;
   border-radius: 14px;
-  height: 360px;
+  height: 330px;
   overflow: hidden;
   position: relative;
 }
@@ -204,7 +215,7 @@ body {
 }
 
 .canvas-footer-note {
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   color: var(--text-secondary);
 }
 
@@ -233,9 +244,9 @@ body {
   background-color: var(--bg-box);
   color: var(--text-primary);
   border: 1px solid var(--border-subtle);
-  border-radius: 10px;
-  padding: 9px 12px;
-  font-size: 0.78rem;
+  border-radius: 12px;
+  padding: 11px 14px;
+  font-size: 0.84rem;
   font-weight: 500;
   cursor: pointer;
   transition: border-color 0.2s, background-color 0.2s;
@@ -243,16 +254,133 @@ body {
 
 .secondary-btn:hover {
   border-color: #484852;
+  background-color: #222228;
+}
+
+.full-width-btn {
+  width: 100%;
+}
+
+/* Seguimiento por misión (3 tarjetas) */
+.stages-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.stage-item-card {
+  width: 100%;
+  background-color: var(--bg-box);
+  border: 1px solid var(--border-subtle);
+  border-radius: 14px;
+  padding: 14px;
+  text-align: left;
+  color: var(--text-primary);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+
+.stage-item-card:hover {
+  border-color: #4a4a55;
   background-color: #202026;
 }
 
-.preset-row {
+.stage-item-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.95rem;
+}
+
+.stage-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--text-secondary);
+}
+
+.stage-item-sub {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+
+.stage-detail-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+/* Fuentes conectadas */
+.telemetry-log-box {
+  background-color: var(--bg-box);
+  border: 1px solid var(--border-subtle);
+  border-radius: 14px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.79rem;
+  line-height: 1.45;
+}
+
+.log-highlight {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.flare-list {
+  list-style: none;
+  color: #c7c7cc;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.log-muted {
+  color: var(--text-secondary);
+}
+
+.log-alert-note {
+  color: var(--accent-red);
+  font-weight: 500;
+}
+
+.log-alert-note:empty {
+  display: none;
+}
+
+/* Estado de ánimo (Emojis) */
+.mood-row {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 8px;
 }
 
-/* Inputs y Formularios (Perfil y Escenario) */
+.mood-btn {
+  background-color: var(--bg-box);
+  border: 1px solid var(--border-subtle);
+  border-radius: 14px;
+  padding: 12px 0;
+  font-size: 1.45rem;
+  cursor: pointer;
+  transition: transform 0.12s, border-color 0.2s, background-color 0.2s;
+}
+
+.mood-btn:hover {
+  transform: translateY(-2px);
+  border-color: #4a4a55;
+}
+
+.mood-btn.active {
+  border-color: var(--accent-mint);
+  background-color: rgba(0, 230, 153, 0.12);
+}
+
+/* Inputs y Perfil */
 .form-row-2 {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -272,7 +400,6 @@ body {
 .field-group label {
   font-size: 0.82rem;
   font-weight: 600;
-  color: var(--text-primary);
 }
 
 .dark-input {
@@ -284,71 +411,13 @@ body {
   padding: 12px 14px;
   font-size: 0.9rem;
   outline: none;
-  transition: border-color 0.2s;
 }
 
 .dark-input:focus {
   border-color: #555562;
 }
 
-/* Sliders */
-.sliders-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.slider-item {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-.slider-labels {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.83rem;
-  color: var(--text-secondary);
-}
-
-.slider-labels strong {
-  color: var(--text-primary);
-}
-
-input[type="range"] {
-  width: 100%;
-  accent-color: var(--accent-mint);
-  cursor: pointer;
-}
-
-/* Métricas */
-.metrics-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-}
-
-.metric-box {
-  background-color: var(--bg-box);
-  border: 1px solid var(--border-subtle);
-  border-radius: 12px;
-  padding: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.metric-name {
-  font-size: 0.76rem;
-  color: var(--text-secondary);
-}
-
-.metric-status {
-  font-size: 0.96rem;
-  font-weight: 600;
-}
-
-/* Pestaña Signos */
+/* Signos Vitales */
 .notice-title {
   font-size: 0.72rem;
   font-weight: 700;
@@ -367,32 +436,63 @@ input[type="range"] {
 
 .vitals-stack {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
   gap: 12px;
 }
 
 .vital-card {
-  gap: 6px;
+  gap: 4px;
 }
 
 .vital-label {
-  font-size: 0.85rem;
+  font-size: 0.84rem;
   color: var(--text-secondary);
 }
 
 .vital-value {
-  font-size: 2.1rem;
+  font-size: 2rem;
   font-weight: 700;
   letter-spacing: -0.5px;
-  color: var(--text-primary);
 }
 
 .vital-note {
-  font-size: 0.74rem;
+  font-size: 0.72rem;
   color: #63636b;
 }
 
-/* Pestaña Historial */
+/* Acordeones explicativos en Signos */
+.accordion-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.accordion-item {
+  background-color: var(--bg-box);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  padding: 11px 14px;
+}
+
+.accordion-item summary {
+  font-size: 0.84rem;
+  font-weight: 600;
+  cursor: pointer;
+  list-style: none;
+}
+
+.accordion-item summary::-webkit-details-marker {
+  display: none;
+}
+
+.accordion-item p {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-top: 8px;
+  line-height: 1.45;
+}
+
+/* Historial */
 .history-list {
   display: flex;
   flex-direction: column;
@@ -403,45 +503,41 @@ input[type="range"] {
   background-color: var(--bg-card);
   border: 1px solid var(--border-subtle);
   border-radius: 18px;
-  padding: 18px;
+  padding: 16px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 5px;
 }
 
 .history-card h3 {
-  font-size: 1.05rem;
+  font-size: 1.02rem;
   font-weight: 600;
 }
 
 .history-meta {
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   color: var(--text-secondary);
 }
 
 .history-situation {
-  font-size: 0.84rem;
+  font-size: 0.83rem;
   color: #c7c7cc;
 }
 
 .history-status-ok {
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   color: var(--accent-mint);
-  display: flex;
-  align-items: center;
-  gap: 6px;
 }
 
 .history-status-alert {
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   color: var(--accent-red);
   line-height: 1.4;
 }
 
 .history-telemetry {
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   color: var(--text-secondary);
-  margin-top: 2px;
 }
 
 .disclaimer-text {
@@ -449,7 +545,114 @@ input[type="range"] {
   color: var(--text-secondary);
 }
 
-/* Barra de Navegación Inferior fija (estilo APK) */
+/* Modales estilo Android Dialog */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.78);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+  z-index: 200;
+}
+
+.modal-backdrop.hidden {
+  display: none;
+}
+
+.modal-card {
+  width: 100%;
+  max-width: 440px;
+  background-color: var(--bg-modal);
+  border: 1px solid var(--border-subtle);
+  border-radius: 22px;
+  padding: 22px 20px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.modal-tall {
+  max-height: 82vh;
+}
+
+.modal-card h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.modal-options {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.scrollable-options {
+  overflow-y: auto;
+  max-height: 56vh;
+  padding-right: 4px;
+}
+
+.modal-option-btn {
+  width: 100%;
+  background: none;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 10px;
+  color: var(--text-primary);
+  font-size: 0.94rem;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.modal-option-btn:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 4px;
+}
+
+.modal-cancel-btn {
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+/* Toast flotante */
+.toast-banner {
+  position: fixed;
+  bottom: 76px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #242429;
+  color: var(--text-primary);
+  border: 1px solid #3a3a44;
+  border-radius: 999px;
+  padding: 10px 18px;
+  font-size: 0.82rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.55);
+  z-index: 250;
+  white-space: nowrap;
+  max-width: 92vw;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.toast-banner.hidden {
+  display: none;
+}
+
+/* Barra de Navegación Inferior */
 .bottom-nav {
   position: fixed;
   bottom: 0;
@@ -476,7 +679,6 @@ input[type="range"] {
   font-size: 0.72rem;
   font-weight: 500;
   cursor: pointer;
-  transition: color 0.15s;
 }
 
 .nav-btn.active {
