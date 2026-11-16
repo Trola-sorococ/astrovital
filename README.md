@@ -19,6 +19,16 @@ Aplicación web instalable (PWA) y app Android para seguir de forma visual el es
 - Funciona sin conexión (Three.js y el decodificador Draco están en `vendor/`) y se puede instalar desde el navegador.
 - App Android nativa en `android/` (APK: `android/ZeroG-Pulse.apk`).
 
+## Idiomas / Languages
+
+| Versión | Idioma | Dónde |
+| --- | --- | --- |
+| Web | Inglés | <https://trola-sorococ.github.io/astrovital/?lang=en> |
+| Web | Español | <https://trola-sorococ.github.io/astrovital/?lang=es> |
+| APK Android (`android/ZeroG-Pulse.apk`) | **Solo español** | No existe APK en inglés; la versión en inglés es la web |
+
+La web elige el idioma del navegador la primera vez y recuerda tu elección (botón **EN / ES** arriba a la derecha).
+
 ## Ejecutar en local
 
 El navegador exige un servidor HTTP (no abrir `index.html` con doble clic):
@@ -45,7 +55,9 @@ python -m http.server 8000
 
 - Título, resumen, explicación detallada, uso de datos NASA y declaración: [`docs/ENTREGA_NASA_SPACE_APPS.md`](docs/ENTREGA_NASA_SPACE_APPS.md)
 - Texto del formulario en inglés: [`docs/SUBMISSION_FORM_EN.md`](docs/SUBMISSION_FORM_EN.md)
-- Referencias y créditos: [`docs/REFERENCIAS.md`](docs/REFERENCIAS.md)
+- Descripción del video de YouTube (inglés): [`docs/YOUTUBE_DESCRIPTION_EN.md`](docs/YOUTUBE_DESCRIPTION_EN.md)
+- Referencias y créditos: [`docs/REFERENCIAS.md`](docs/REFERENCIAS.md) · [`docs/REFERENCES_EN.md`](docs/REFERENCES_EN.md)
+- Uso de IA: Claude, Gemini y Cursor (código, traducción y guion); voz del video con texto a voz de CapCut.
 
 ## Datos NASA utilizados
 

@@ -29,7 +29,10 @@
           <span class="dot"></span>
           <span>ÓRBITA / BIENESTAR</span>
         </div>
-        <div id="connection-status" class="status-badge">Cargando modelo...</div>
+        <div class="header-actions">
+          <div id="connection-status" class="status-badge">Cargando modelo...</div>
+          <button type="button" id="btn-lang" class="lang-btn" aria-label="Language / Idioma">EN</button>
+        </div>
       </div>
     </header>
 
@@ -375,14 +378,15 @@
       </form>
       <article class="card">
         <h2>Créditos y datos NASA</h2>
-        <p class="card-sub">
-          Datos abiertos: <a href="https://ccmc.gsfc.nasa.gov/tools/DONKI/" target="_blank" rel="noopener">NASA DONKI</a> (llamaradas solares),
-          <a href="https://osdr.nasa.gov/bio/" target="_blank" rel="noopener">NASA OSDR</a> (estudios OSD-980 y OSD-781) y
-          <a href="https://visualization.osdr.nasa.gov/radlab/" target="_blank" rel="noopener">OSDR RadLab</a> (dosimetría DosTel ISS).
-          Visor 3D con <a href="https://threejs.org/" target="_blank" rel="noopener">Three.js</a> (MIT).
-          Referencias completas en <a href="docs/REFERENCIAS.md" target="_blank" rel="noopener">docs/REFERENCIAS.md</a>.
-        </p>
-        <p class="disclaimer-text">Proyecto educativo del equipo ZeroG-Pulse (NASA Space Apps Challenge). No es un dispositivo médico ni sustituye una evaluación clínica.</p>
+        <p class="card-sub">Datos abiertos:</p>
+        <ul class="credits-list">
+          <li><a href="https://ccmc.gsfc.nasa.gov/tools/DONKI/" target="_blank" rel="noopener">NASA DONKI</a> <span>· llamaradas solares</span></li>
+          <li><a href="https://osdr.nasa.gov/bio/" target="_blank" rel="noopener">NASA OSDR</a> <span>· estudios OSD-980 y OSD-781</span></li>
+          <li><a href="https://visualization.osdr.nasa.gov/radlab/" target="_blank" rel="noopener">OSDR RadLab</a> <span>· dosimetría DosTel ISS</span></li>
+          <li><a href="https://threejs.org/" target="_blank" rel="noopener">Three.js</a> <span>· visor 3D (MIT)</span></li>
+          <li><a href="docs/REFERENCIAS.md" target="_blank" rel="noopener">docs/REFERENCIAS.md</a> <span>· referencias completas</span></li>
+        </ul>
+        <p class="disclaimer-text">Proyecto educativo del equipo ZeroG-Pulse (NASA Space Apps Challenge). No está afiliado ni respaldado por la NASA. No es un dispositivo médico ni sustituye una evaluación clínica.</p>
       </article>
     </section>
   </div>

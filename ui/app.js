@@ -3,6 +3,17 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 import { calcularRiesgo } from '../model/risk.js';
+import { t, translateDocument, LOCALE } from './i18n.js';
+
+// Traduce el HTML estático si el idioma activo es inglés (el código fuente está en español).
+translateDocument();
+
+// Fecha y hora de un registro, en el idioma activo (se deriva del id, que es Date.now()).
+function formatStamp(item) {
+  if (!item || !item.id) return (item && item.timestamp) || '';
+  const d = new Date(item.id);
+  return `${d.toLocaleDateString(LOCALE)} · ${d.toLocaleTimeString(LOCALE, { hour: '2-digit', minute: '2-digit' })}`;
+}
 
 // Escapa texto antes de insertarlo con innerHTML (los registros viven en localStorage).
 function esc(value) {
@@ -295,7 +306,7 @@ gltfLoader.load(
       heartPivot.scale.setScalar(heartScale);
     }
 
-    statusEl.textContent = 'Modelo listo · En línea';
+    statusEl.textContent = t('Modelo listo · En línea');
     const history = loadHistory();
     if (history.length > 0 && history[0].alertZones) {
       applyZoneHighlights(history[0].alertZones);
@@ -303,7 +314,7 @@ gltfLoader.load(
   },
   undefined,
   () => {
-    statusEl.textContent = 'Error cargando modelo 3D';
+    statusEl.textContent = t('Error cargando modelo 3D');
   }
 );
 
@@ -320,7 +331,7 @@ SITUATIONS.forEach((sit) => {
   const btn = document.createElement('button');
   btn.type = 'button';
   btn.className = 'modal-option-btn';
-  btn.textContent = sit.name;
+  btn.textContent = t(sit.name);
   btn.addEventListener('click', () => {
     modalSituation.classList.add('hidden');
     executeScan(pendingStageKey, pendingStageTitle, sit);
@@ -407,7 +418,7 @@ function executeScan(stageKey, stageTitle, situationObj) {
   updateHomeStageSummaries();
   renderHistory();
   openStageDetail(stageKey);
-  showToast('Escaneo guardado en su etapa y en Historial');
+  showToast(t('Escaneo guardado en su etapa y en Historial'));
 }
 
 function updateHomeStageSummaries() {
@@ -417,8 +428,8 @@ function updateHomeStageSummaries() {
     const el = document.getElementById(`stage-summary-${key}`);
     if (el) {
       el.textContent = latest
-        ? `Último registro: ${latest.timestamp} · toca para ver ·`
-        : 'Aún no hay escaneos · toca para abrir ·';
+        ? t('Último registro: {0} · toca para ver ·', formatStamp(latest))
+        : t('Aún no hay escaneos · toca para abrir ·');
     }
   });
 
@@ -426,7 +437,7 @@ function updateHomeStageSummaries() {
   const latestWithAlerts = history.find((item) => item.zoneLabels && item.zoneLabels.length > 0);
   if (redNoteEl) {
     redNoteEl.textContent = latestWithAlerts
-      ? `${latestWithAlerts.timestamp} · Zonas señaladas: ${latestWithAlerts.zoneLabels.join(', ')}`
+      ? t('{0} · Zonas señaladas: {1}', formatStamp(latestWithAlerts), latestWithAlerts.zoneLabels.map((z) => t(z)).join(', '))
       : '';
   }
 }
@@ -436,7 +447,7 @@ function renderHistory() {
   const history = loadHistory();
 
   if (history.length === 0) {
-    listEl.innerHTML = `<div class="history-card"><p class="card-sub">No hay escaneos guardados aún. Usa "Escanear y guardar resultados" en Inicio.</p></div>`;
+    listEl.innerHTML = `<div class="history-card"><p class="card-sub">${esc(t('No hay escaneos guardados aún. Usa "Escanear y guardar resultados" en Inicio.'))}</p></div>`;
     return;
   }
 
@@ -444,16 +455,16 @@ function renderHistory() {
     .map((item) => {
       const hasAlerts = item.zoneLabels && item.zoneLabels.length > 0;
       const statusHtml = hasAlerts
-        ? `<div class="history-status-alert">● Zonas marcadas: ${esc(item.zoneLabels.join(', '))}</div>`
-        : `<div class="history-status-ok">● Estado estable · sin zonas marcadas</div>`;
+        ? `<div class="history-status-alert">${esc(t('● Zonas marcadas: {0}', item.zoneLabels.map((z) => t(z)).join(', ')))}</div>`
+        : `<div class="history-status-ok">${esc(t('● Estado estable · sin zonas marcadas'))}</div>`;
 
       return `
         <article class="history-card">
-          <h3>${esc(item.title)}</h3>
-          <div class="history-meta">${esc(item.timestamp)} · ${esc(item.stageLabel)}</div>
-          <div class="history-situation">Situación: ${esc(item.situation)}</div>
+          <h3>${esc(t(item.title))}</h3>
+          <div class="history-meta">${esc(formatStamp(item))} · ${esc(t(item.stageLabel))}</div>
+          <div class="history-situation">${esc(t('Situación: {0}', t(item.situation)))}</div>
           ${statusHtml}
-          <div class="history-telemetry">FC ${esc(item.bpm)} lpm · SpO₂ ${esc(item.spo2)}% · Temp. ${esc(item.temp)} °C (simulado)</div>
+          <div class="history-telemetry">${esc(t('FC {0} lpm · SpO₂ {1}% · Temp. {2} °C (simulado)', item.bpm, item.spo2, item.temp))}</div>
         </article>
       `;
     })
@@ -465,7 +476,7 @@ document.getElementById('btn-clear-history').addEventListener('click', () => {
   applyZoneHighlights([]);
   updateHomeStageSummaries();
   renderHistory();
-  showToast('Historial limpiado');
+  showToast(t('Historial limpiado'));
 });
 
 // ==================== 7. SUBVISTA DETALLE DE ETAPA ====================
@@ -476,7 +487,7 @@ function openStageDetail(stageKey) {
     during: 'Durante la misión',
     after: 'Después del viaje'
   };
-  document.getElementById('stage-detail-title').textContent = titles[stageKey];
+  document.getElementById('stage-detail-title').textContent = t(titles[stageKey]);
 
   const history = loadHistory().filter((item) => item.stageKey === stageKey);
   const latestCard = document.getElementById('stage-latest-card');
@@ -487,25 +498,25 @@ function openStageDetail(stageKey) {
     applyZoneHighlights(latest.alertZones || []);
     const hasAlerts = latest.zoneLabels && latest.zoneLabels.length > 0;
     latestCard.innerHTML = `
-      <h2>${esc(latest.title)}</h2>
-      <div class="history-meta">${esc(latest.timestamp)} · registro local</div>
-      <div class="history-situation"><strong>Situación evaluada:</strong> ${esc(latest.situation)} · simulación</div>
-      <p class="card-sub">${esc(latest.effectNote)}</p>
+      <h2>${esc(t(latest.title))}</h2>
+      <div class="history-meta">${esc(t('{0} · registro local', formatStamp(latest)))}</div>
+      <div class="history-situation"><strong>${esc(t('Situación evaluada:'))}</strong> ${esc(t(latest.situation))} · ${esc(t('simulación'))}</div>
+      <p class="card-sub">${esc(t(latest.effectNote))}</p>
       ${hasAlerts
-        ? `<div class="history-status-alert">● Zonas destacadas por simulación: ${esc(latest.zoneLabels.join(', '))}</div>`
-        : `<div class="history-status-ok">● Indicadores simulados estables · sin zonas marcadas</div>`
+        ? `<div class="history-status-alert">${esc(t('● Zonas destacadas por simulación: {0}', latest.zoneLabels.map((z) => t(z)).join(', ')))}</div>`
+        : `<div class="history-status-ok">${esc(t('● Indicadores simulados estables · sin zonas marcadas'))}</div>`
       }
-      <div class="history-telemetry">Frecuencia cardíaca: ${esc(latest.bpm)} lpm · Oxígeno: ${esc(latest.spo2)}% · Temperatura: ${esc(latest.temp)} °C (datos simulados)</div>
-      <div class="history-telemetry">Sueño (dato demo): ${esc(latest.sleep)} h · Estrés (dato demo): ${esc(latest.stress)}/100</div>
+      <div class="history-telemetry">${esc(t('Frecuencia cardíaca: {0} lpm · Oxígeno: {1}% · Temperatura: {2} °C (datos simulados)', latest.bpm, latest.spo2, latest.temp))}</div>
+      <div class="history-telemetry">${esc(t('Sueño (dato demo): {0} h · Estrés (dato demo): {1}/100', latest.sleep, latest.stress))}</div>
     `;
 
     recordsList.innerHTML = history
       .map(
         (r) => `
         <div class="history-card">
-          <h3>${esc(r.title)}</h3>
-          <div class="history-meta">${esc(r.timestamp)} · ${(r.zoneLabels || []).length > 0 ? 'con zonas marcadas' : 'estable'}</div>
-          <div class="history-situation">Situación: ${esc(r.situation)}</div>
+          <h3>${esc(t(r.title))}</h3>
+          <div class="history-meta">${esc(formatStamp(r))} · ${esc((r.zoneLabels || []).length > 0 ? t('con zonas marcadas') : t('estable'))}</div>
+          <div class="history-situation">${esc(t('Situación: {0}', t(r.situation)))}</div>
         </div>
       `
       )
@@ -513,10 +524,10 @@ function openStageDetail(stageKey) {
   } else {
     applyZoneHighlights([]);
     latestCard.innerHTML = `
-      <h2>Sin escaneos en ${titles[stageKey]}</h2>
-      <p class="card-sub">Presiona el botón inferior para registrar una evaluación en esta fase.</p>
+      <h2>${esc(t('Sin escaneos en {0}', t(titles[stageKey])))}</h2>
+      <p class="card-sub">${esc(t('Presiona el botón inferior para registrar una evaluación en esta fase.'))}</p>
     `;
-    recordsList.innerHTML = `<div class="history-card"><p class="card-sub">Aún no hay registros en esta etapa.</p></div>`;
+    recordsList.innerHTML = `<div class="history-card"><p class="card-sub">${esc(t('Aún no hay registros en esta etapa.'))}</p></div>`;
   }
 
   // Mover el visor 3D a la subvista de etapa
@@ -554,15 +565,15 @@ document.querySelectorAll('.mood-btn').forEach((btn) => {
     document.querySelectorAll('.mood-btn').forEach((b) => b.classList.remove('active'));
     btn.classList.add('active');
     selectedMood = btn.dataset.mood;
-    showToast(`Estado seleccionado: ${selectedMood}`);
+    showToast(t('Estado seleccionado: {0}', t(selectedMood)));
   });
 });
 
 document.getElementById('btn-save-mood').addEventListener('click', () => {
   const note = document.getElementById('mood-note').value.trim();
   localStorage.setItem(MOOD_KEY, JSON.stringify({ mood: selectedMood, note }));
-  document.getElementById('mood-feedback').textContent = `✓ Guardado: ${selectedMood}${note ? ` — "${note}"` : ''}`;
-  showToast('Estado de ánimo guardado en este dispositivo');
+  document.getElementById('mood-feedback').textContent = t('✓ Guardado: {0}', `${t(selectedMood)}${note ? ` — "${note}"` : ''}`);
+  showToast(t('Estado de ánimo guardado en este dispositivo'));
 });
 
 const MOOD_KEY = 'astrovital_mood_v1';
@@ -573,7 +584,7 @@ function restoreMood() {
     selectedMood = saved.mood;
     document.querySelectorAll('.mood-btn').forEach((b) => b.classList.toggle('active', b.dataset.mood === selectedMood));
     document.getElementById('mood-note').value = saved.note || '';
-    document.getElementById('mood-feedback').textContent = `Estado actual: ${selectedMood}`;
+    document.getElementById('mood-feedback').textContent = t('Estado actual: {0}', t(selectedMood));
   } catch {
     // Registro dañado: se ignora
   }
@@ -588,11 +599,13 @@ async function loadRiskInputs() {
     const res = await fetch('data/risk_inputs.json', { cache: 'no-cache' });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     riskInputs = await res.json();
-    statusEl2.textContent =
-      `JSON · generado ${riskInputs.generated || 'sin fecha'} · estado: incluido con la aplicación · misión, radiación y CO₂ provisionales`;
+    statusEl2.textContent = t(
+      'JSON · generado {0} · estado: incluido con la aplicación · misión, radiación y CO₂ provisionales',
+      riskInputs.generated || t('sin fecha')
+    );
   } catch {
     riskInputs = null;
-    statusEl2.textContent = 'JSON · no disponible (sin datos de entrada) · no se inventan valores';
+    statusEl2.textContent = t('JSON · no disponible (sin datos de entrada) · no se inventan valores');
   }
   updateCumulativeEffects();
 }
@@ -615,21 +628,22 @@ function renderFlares(flares, statusText, cachedAt) {
       .slice(0, 5)
       .forEach((f) => {
         const li = document.createElement('li');
-        li.textContent = `• ${f.beginTime} · clase ${f.classType}`;
+        li.textContent = t('• {0} · clase {1}', f.beginTime, f.classType);
         listEl.appendChild(li);
       });
   }
   if (Array.isArray(flares)) {
-    donkiEl.textContent = `Llamaradas DONKI: ${flares.length} evento(s) en 30 días${cachedAt ? ` · caché del ${cachedAt}` : ''}`;
+    donkiEl.textContent =
+      t('Llamaradas DONKI: {0} evento(s) en 30 días', flares.length) + (cachedAt ? t(' · caché del {0}', cachedAt) : '');
   } else {
-    donkiEl.textContent = 'Llamaradas DONKI: sin dato (unavailable) · no se asume cero';
+    donkiEl.textContent = t('Llamaradas DONKI: sin dato (unavailable) · no se asume cero');
   }
   document.getElementById('api-updated-text').textContent = statusText;
 }
 
 async function refreshSpaceWeather(manual = true) {
   const now = new Date();
-  const stamp = `${now.toLocaleDateString('es-GT')} ${now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+  const stamp = `${now.toLocaleDateString(LOCALE)} ${now.toLocaleTimeString(LOCALE, { hour: '2-digit', minute: '2-digit' })}`;
   const url = `https://ccmc.gsfc.nasa.gov/DONKI-API/get/FLR?startDate=${isoDay(new Date(now.getTime() - 30 * 86400000))}&endDate=${isoDay(now)}`;
   try {
     const res = await fetch(url);
@@ -641,8 +655,8 @@ async function refreshSpaceWeather(manual = true) {
       .map((f) => ({ beginTime: f.beginTime, classType: f.classType }));
     latestFlares = flares;
     localStorage.setItem(FLARES_CACHE_KEY, JSON.stringify({ at: stamp, flares }));
-    renderFlares(flares, `API NASA DONKI actualizada ${stamp} · ${flares.length} llamaradas en los últimos 30 días`);
-    if (manual) showToast('Datos de clima espacial actualizados');
+    renderFlares(flares, t('API NASA DONKI actualizada {0} · {1} llamaradas en los últimos 30 días', stamp, flares.length));
+    if (manual) showToast(t('Datos de clima espacial actualizados'));
   } catch {
     let cached = null;
     try {
@@ -652,12 +666,12 @@ async function refreshSpaceWeather(manual = true) {
     }
     if (cached && Array.isArray(cached.flares)) {
       latestFlares = cached.flares;
-      renderFlares(cached.flares, `Sin conexión con DONKI · mostrando la última respuesta válida (${cached.at})`, cached.at);
+      renderFlares(cached.flares, t('Sin conexión con DONKI · mostrando la última respuesta válida ({0})', cached.at), cached.at);
     } else {
       latestFlares = null;
-      renderFlares(null, 'Sin conexión con DONKI · sin respuesta guardada');
+      renderFlares(null, t('Sin conexión con DONKI · sin respuesta guardada'));
     }
-    if (manual) showToast('No se pudo consultar DONKI; se muestra el último dato guardado');
+    if (manual) showToast(t('No se pudo consultar DONKI; se muestra el último dato guardado'));
   }
   updateCumulativeEffects();
 }
@@ -678,7 +692,7 @@ function refreshLiveVitals() {
   const stress = Math.min(92, Math.max(18, Math.round((hr - 50) * 1.4)));
 
   document.getElementById('vital-timestamp').textContent = timeStr;
-  document.getElementById('vital-hr').textContent = `${hr} lpm`;
+  document.getElementById('vital-hr').textContent = t('{0} lpm', hr);
   document.getElementById('vital-spo2').textContent = `${spo2} %`;
   document.getElementById('vital-temp').textContent = `${temp} °C`;
   document.getElementById('vital-sleep').textContent = `${sleep} h`;
@@ -696,23 +710,21 @@ let currentProfile = {};
 // Efectos acumulados: se calculan con model/risk.js (modelo experimental, no clínico).
 function updateCumulativeEffects() {
   const duration = Math.max(1, Number(currentProfile.duration) || 180);
-  document.getElementById('cumulative-horizon').textContent = `Horizonte: ${duration} días · duración fija del perfil`;
+  document.getElementById('cumulative-horizon').textContent = t('Horizonte: {0} días · duración fija del perfil', duration);
 
   const risk = calcularRiesgo({
     mission_day: duration,
     radiation_uSv_h: riskInputs ? riskInputs.radiation_uSv_h : undefined,
     solar_flares_30d: latestFlares || []
   });
-  document.getElementById('cumulative-femur').textContent =
-    `Hueso (fémur): ${(risk.bone_femur.risk * 100).toFixed(1)}% de índice estimado`;
-  document.getElementById('cumulative-muscle').textContent =
-    `Músculo (piernas): ${(risk.muscle_legs.risk * 100).toFixed(1)}% de índice estimado`;
+  document.getElementById('cumulative-femur').textContent = t('Hueso (fémur): {0}% de índice estimado', (risk.bone_femur.risk * 100).toFixed(1));
+  document.getElementById('cumulative-muscle').textContent = t('Músculo (piernas): {0}% de índice estimado', (risk.muscle_legs.risk * 100).toFixed(1));
 }
 
 function applyProfileToUI(profile) {
   currentProfile = profile || {};
   const name = (currentProfile.name || '').trim();
-  document.getElementById('greeting-title').textContent = name ? `Hola, ${name}` : 'Hola, tripulante';
+  document.getElementById('greeting-title').textContent = name ? t('Hola, {0}', name) : t('Hola, tripulante');
   updateCumulativeEffects();
 }
 
@@ -746,7 +758,7 @@ document.getElementById('profile-form').addEventListener('submit', (e) => {
 
   localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
   applyProfileToUI(profile);
-  showToast('Perfil guardado en este dispositivo');
+  showToast(t('Perfil guardado en este dispositivo'));
 });
 
 loadProfile();

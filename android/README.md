@@ -2,6 +2,8 @@
 
 Aplicación Android nativa en Kotlin para seguimiento visual de una misión. Perfil, JSON, caché de actividad espacial y escaneos se guardan localmente.
 
+> **Idioma:** esta app Android y su APK están **solo en español**. La versión en inglés es la web: <https://trola-sorococ.github.io/astrovital/?lang=en>.
+
 ## Instalar
 
 Abre `ZeroG-Pulse.apk` en Android. Versión 0.7.0 (versionCode 7), firmada con la clave de depuración usada en las versiones anteriores de PRUEBA2 para permitir actualizar la instalación. El ícono del lanzador usa el pulso proporcionado y el nombre visible es Astrovital.

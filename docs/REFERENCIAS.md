@@ -24,6 +24,9 @@ El JSON `data/risk_inputs.json` usa los nombres y tipos del contrato del equipo.
 | [Python `requests`](https://requests.readthedocs.io/) | Script de ingesta `data/ingest/fetch_nasa_data.py` | Apache-2.0 |
 | Kotlin / Android SDK | App nativa en `android/` | Apache-2.0 |
 | [GitHub Pages](https://pages.github.com/) | Despliegue web | — |
+| Imagen de Marte (solo en video/láminas) | Visual | Canal de YouTube "GeoEnciclopedia" **(agregar enlace y confirmar permiso, o reemplazar)** |
+| CapCut (texto a voz) | Voz en off del video, generada con IA | Términos de CapCut |
+| Claude, Gemini, Cursor | Asistencia de IA: código, traducción, guion, documentación | — |
 
 ## Actualización de datos
 

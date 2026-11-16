@@ -7,6 +7,7 @@ const SHELL = [
   './manifest.webmanifest',
   './ui/styles.css',
   './ui/app.js',
+  './ui/i18n.js',
   './model/risk.js',
   './data/risk_inputs.json',
   './assets/modelo_zerog_pulse.glb',

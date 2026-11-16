@@ -21,8 +21,10 @@ Submit only one of the two formats. Open the link in an incognito window before 
 
 ## Link to Final Project
 
-- Live web app: https://trola-sorococ.github.io/astrovital/
+- Live web app (English): https://trola-sorococ.github.io/astrovital/?lang=en
+- Spanish version: https://trola-sorococ.github.io/astrovital/?lang=es
 - Open-source repository: https://github.com/Trola-sorococ/astrovital
+- Note: the Android APK in the repository (`android/ZeroG-Pulse.apk`) is Spanish only. The English version is the web app above.
 
 ## Detailed Project Description
 
@@ -56,15 +58,23 @@ Submit only one of the two formats. Open the link in an incognito window before 
 - Three.js r170 (MIT license): https://threejs.org/ (includes OrbitControls, GLTFLoader, DRACOLoader)
 - Draco 3D decoder (Apache-2.0): https://github.com/google/draco
 - Python `requests` (Apache-2.0): https://requests.readthedocs.io/
-- 3D body model `assets/modelo_zerog_pulse.glb`: **[TO COMPLETE: author, source and license]**
-- Any image used in the slides or video (for example the Mars image): **[TO COMPLETE: author, source, license]**
-- Full list: https://github.com/Trola-sorococ/astrovital/blob/main/docs/REFERENCIAS.md
+- 3D body model `assets/modelo_zerog_pulse.glb`: created by the team. **[Confirm before submitting; if any part came from a library such as Sketchfab or SketchUp 3D Warehouse, credit the author and license.]**
+- Mars image used in the video/slides: from the YouTube channel "GeoEnciclopedia" **[add the link and confirm permission; if there is no permission, replace it with an image whose license allows reuse]**
+- Voice-over: CapCut text-to-speech (see "Use of AI").
+- Full list: https://github.com/Trola-sorococ/astrovital/blob/main/docs/REFERENCES_EN.md
 
 ## Use of AI
 
-**[REVIEW AND CORRECT before submitting; it must be true]**
+**[Review before submitting; it must be true]**
 
-The English translation and the presentation/narration script were assisted by AI tools. Parts of the web app code, the documentation and a code review were assisted by an AI coding assistant (Cursor with a Claude model); all of it was reviewed and tested by the team. The video voice-over, if any, was generated with **[tool name / or "recorded by a team member"]**. The 3D model and the visual design were created by **[the team / source]**. No AI-generated content uses or modifies any agency logo or identifier.
+AI tools used: Claude, Gemini and Cursor.
+
+- Claude and Gemini assisted with the English translation, the presentation text and the narration script.
+- Cursor (with Claude) assisted with parts of the web app code, the English/Spanish interface, the documentation and a code review.
+- The video voice-over is AI-generated with CapCut text-to-speech, voice "**[exact voice name]**". This is also declared in the YouTube description.
+- The 3D body model, the design and the project idea were created by the team and are not AI-generated. **[Update if not true.]**
+- No AI-generated image or video is used. **[Update if not true; AI images/videos need a visible watermark.]**
+- All AI-assisted content was reviewed and tested by the team. No AI-generated content uses or modifies any agency logo or identifier.
 
 ## Verification
 
