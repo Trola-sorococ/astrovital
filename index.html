@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Órbita / Bienestar | AstroVital 3D</title>
+  <title>Órbita / Bienestar | AstroVital</title>
   <link rel="stylesheet" href="ui/styles.css" />
   <script type="importmap">
     {
@@ -16,7 +16,7 @@
 </head>
 <body>
   <div class="app-shell">
-    <!-- Encabezado persistente estilo Órbita / Bienestar -->
+    <!-- Encabezado superior fijo -->
     <header class="top-header">
       <div class="header-top-row">
         <div class="brand-pill">
@@ -27,7 +27,7 @@
       </div>
     </header>
 
-    <!-- ==================== VISTA 1: INICIO ==================== -->
+    <!-- ==================== PESTAÑA 1: INICIO ==================== -->
     <section id="view-inicio" class="tab-view active">
       <p class="mission-subtitle">CENTRO DE SALUD · MISIÓN AURORA</p>
       <div class="greeting-block">
@@ -35,175 +35,282 @@
         <p class="lead-text">Resumen personal de bienestar y signos vitales.</p>
       </div>
 
-      <div class="mission-bar">
+      <button type="button" id="btn-mission-pill" class="mission-bar">
         <span class="bar-icon">⊡</span>
-        <span id="mission-bar-text">SEGUIMIENTO DE MISIÓN · 180 DÍAS PROGRAMADOS</span>
-      </div>
+        <span id="mission-bar-text">SEGUIMIENTO DE MISIÓN</span>
+      </button>
 
-      <div class="main-grid">
-        <!-- Tarjeta Izquierda: Visor 3D Tripulante -->
-        <article class="card viewer-card">
-          <div class="card-header">
-            <div>
-              <h2>Tripulante</h2>
-              <p class="card-sub">Modelo anatómico local · arrastra la figura para girarla</p>
-            </div>
-            <span class="tag-pill">ESCANEO 3D</span>
-          </div>
-
-          <div class="canvas-wrapper">
-            <div id="canvas-container"></div>
-          </div>
-
-          <p class="canvas-footer-note">Modelo anatómico listo · arrastra para girarlo</p>
-
-          <button type="button" id="btn-scan" class="primary-btn">
-            <span>✳</span> Escanear y guardar resultados
-          </button>
-        </article>
-
-        <!-- Columna Derecha: Simulación y Escenario -->
-        <div class="right-column">
-          <article class="card">
+      <!-- Grid adaptativo: 2 columnas en PC, 1 columna apilada en celular -->
+      <div class="desktop-split-grid">
+        <!-- Columna Principal: Visor 3D Tripulante -->
+        <div class="split-left">
+          <article class="card viewer-card">
             <div class="card-header">
               <div>
-                <h2>Escenario y telemetría</h2>
-                <p class="card-sub">Configura etapa, situación orbital y parámetros</p>
+                <h2>Tripulante</h2>
+                <p class="card-sub">Modelo anatómico local · arrastra la figura para girarla</p>
               </div>
-              <span class="tag-pill">SIMULADOR</span>
+              <span class="tag-pill">ESCANEO 3D</span>
             </div>
 
-            <div class="form-row-2">
-              <div class="field-group">
-                <label for="stage-select">Etapa de misión</label>
-                <select id="stage-select" class="dark-input">
-                  <option value="Durante la misión">Durante la misión</option>
-                  <option value="Antes del viaje">Antes del viaje</option>
-                </select>
-              </div>
-              <div class="field-group">
-                <label for="situation-select">Situación</label>
-                <select id="situation-select" class="dark-input">
-                  <option value="Órbita nominal">Órbita nominal</option>
-                  <option value="Exposición a radiación espacial">Exposición a radiación espacial</option>
-                  <option value="Aumento de CO₂ en cabina">Aumento de CO₂ en cabina</option>
-                  <option value="Evento o tormenta solar">Evento o tormenta solar</option>
-                </select>
-              </div>
+            <div class="canvas-wrapper">
+              <div id="canvas-container"></div>
             </div>
 
-            <div class="sliders-list">
-              <div class="slider-item">
-                <div class="slider-labels">
-                  <span>Días en órbita</span>
-                  <strong id="days-val">45 días</strong>
-                </div>
-                <input type="range" id="days-slider" min="1" max="365" value="45" />
-              </div>
+            <p class="canvas-footer-note">Modelo anatómico listo · arrastra para girarlo</p>
 
-              <div class="slider-item">
-                <div class="slider-labels">
-                  <span>Frecuencia cardíaca (FC)</span>
-                  <strong id="bpm-val">78 lpm</strong>
-                </div>
-                <input type="range" id="bpm-slider" min="50" max="175" value="78" />
-              </div>
-
-              <div class="slider-item">
-                <div class="slider-labels">
-                  <span>Contramedidas / Ejercicio</span>
-                  <strong id="exercise-val">60%</strong>
-                </div>
-                <input type="range" id="exercise-slider" min="0" max="100" value="60" />
-              </div>
-            </div>
-
-            <div class="preset-row">
-              <button type="button" id="btn-nominal" class="secondary-btn">Órbita nominal</button>
-              <button type="button" id="btn-eva" class="secondary-btn">Radiación / EVA</button>
-              <button type="button" id="btn-critical" class="secondary-btn">Alerta crítica</button>
-            </div>
+            <button type="button" id="btn-open-scan" class="primary-btn">
+              <span>✳</span> Escanear y guardar resultados
+            </button>
           </article>
 
+          <!-- Seguimiento por misión (3 tarjetas clicables) -->
           <article class="card">
             <div class="card-header">
               <div>
-                <h2>Zonas anatómicas</h2>
-                <p class="card-sub">Diagnóstico visual en tiempo real</p>
+                <h2>Seguimiento por misión</h2>
+                <p class="card-sub">Consulta los registros guardados en cada fase</p>
               </div>
-              <span class="tag-pill">JSON LISTO</span>
+              <span class="tag-pill">TRES ETAPAS</span>
             </div>
 
-            <div id="metrics-grid" class="metrics-grid">
-              <div class="metric-box">
-                <span class="metric-name">Corazón y vasos</span>
-                <strong id="risk-heart" class="metric-status">Óptimo</strong>
-              </div>
-              <div class="metric-box">
-                <span class="metric-name">Columna (bone_spine)</span>
-                <strong id="risk-spine" class="metric-status">Óptimo</strong>
-              </div>
-              <div class="metric-box">
-                <span class="metric-name">Fémur Izq / Der</span>
-                <strong id="risk-femur" class="metric-status">Óptimo</strong>
-              </div>
-              <div class="metric-box">
-                <span class="metric-name">Masa muscular (body)</span>
-                <strong id="risk-body" class="metric-status">Óptimo</strong>
-              </div>
+            <div class="stages-list">
+              <button type="button" class="stage-item-card" data-stage="before">
+                <div class="stage-item-top">
+                  <span class="stage-dot"></span>
+                  <strong>Antes del viaje</strong>
+                </div>
+                <p id="stage-summary-before" class="stage-item-sub">Aún no hay escaneos · toca para abrir ·</p>
+              </button>
+
+              <button type="button" class="stage-item-card" data-stage="during">
+                <div class="stage-item-top">
+                  <span class="stage-dot"></span>
+                  <strong>Durante la misión</strong>
+                </div>
+                <p id="stage-summary-during" class="stage-item-sub">Aún no hay escaneos · toca para abrir ·</p>
+              </button>
+
+              <button type="button" class="stage-item-card" data-stage="after">
+                <div class="stage-item-top">
+                  <span class="stage-dot"></span>
+                  <strong>Después del viaje</strong>
+                </div>
+                <p id="stage-summary-after" class="stage-item-sub">Aún no hay escaneos · toca para abrir ·</p>
+              </button>
             </div>
+          </article>
+        </div>
+
+        <!-- Columna Secundaria: Fuentes conectadas y Estado de ánimo -->
+        <div class="split-right">
+          <article class="card">
+            <div class="card-header">
+              <div>
+                <h2>Fuentes conectadas</h2>
+                <p class="card-sub">API de clima espacial · llamaradas solares (últimos 30 días)</p>
+              </div>
+              <span class="tag-pill">JSON + API en línea</span>
+            </div>
+
+            <div class="telemetry-log-box">
+              <p class="log-highlight" id="api-updated-text">API actualizada · 14 eventos en respuesta API guardada</p>
+              <ul class="flare-list" id="flare-list">
+                <li>• 2026-10-16T15:38Z · clase M1.3</li>
+                <li>• 2026-10-19T08:54Z · clase M1.6</li>
+                <li>• 2026-10-23T03:43Z · clase C1.3</li>
+              </ul>
+              <p class="log-muted" id="json-status-text">JSON · fecha 2026-11-13T18:00:00-06:00 · estado: JSON incluido con la aplicación</p>
+              <p class="log-muted">Radiación DosTel: 28.303083 µGy/h · referencia histórica (2023-01-01)</p>
+              <p class="log-muted">No equivale a µSv/h ni representa exposición actual de la tripulación.</p>
+              <p class="log-muted">CO₂ cabina: sin dato · no incluido en este JSON</p>
+              <p class="log-muted">Llamaradas DONKI: sin dato (unavailable) · no se asume cero</p>
+              <p id="latest-scan-red-note" class="log-alert-note"></p>
+            </div>
+
+            <button type="button" id="btn-refresh-api" class="secondary-btn full-width-btn">
+              Actualizar API de clima espacial
+            </button>
+          </article>
+
+          <!-- Tarjeta: ¿Cómo te sientes? -->
+          <article class="card">
+            <div class="card-header">
+              <div>
+                <h2>¿Cómo te sientes?</h2>
+                <p class="card-sub">Registro subjetivo de bienestar diario</p>
+              </div>
+              <span class="tag-pill">GUARDADO EN EL TELÉFONO</span>
+            </div>
+
+            <div class="mood-row" id="mood-row">
+              <button type="button" class="mood-btn" data-mood="Muy bajo" title="Muy bajo">😫</button>
+              <button type="button" class="mood-btn" data-mood="Bajo" title="Bajo">😕</button>
+              <button type="button" class="mood-btn" data-mood="Neutral" title="Neutral">😐</button>
+              <button type="button" class="mood-btn active" data-mood="Bien" title="Bien">🙂</button>
+              <button type="button" class="mood-btn" data-mood="Muy bien" title="Muy bien">😄</button>
+            </div>
+
+            <div class="field-group">
+              <label for="mood-note">Nota personal (opcional)</label>
+              <input type="text" id="mood-note" class="dark-input" placeholder="Sueño, ánimo o algo que quieras recordar..." />
+            </div>
+
+            <button type="button" id="btn-save-mood" class="secondary-btn full-width-btn">
+              Guardar registro en este dispositivo
+            </button>
+            <p id="mood-feedback" class="disclaimer-text">Estado actual: Bien</p>
           </article>
         </div>
       </div>
     </section>
 
-    <!-- ==================== VISTA 2: SIGNOS ==================== -->
+    <!-- ==================== SUBVISTA: DETALLE DE ETAPA ==================== -->
+    <section id="view-stage-detail" class="tab-view">
+      <div class="stage-detail-top">
+        <button type="button" id="btn-back-home" class="secondary-btn">← Volver a Inicio</button>
+        <span class="mission-subtitle">Seguimiento por misión</span>
+      </div>
+
+      <div class="greeting-block">
+        <h1 id="stage-detail-title">Antes del viaje</h1>
+        <p class="lead-text">Escaneo visual de demostración · los valores no son mediciones clínicas.</p>
+      </div>
+
+      <div class="desktop-split-grid">
+        <div class="split-left">
+          <article id="stage-latest-card" class="card">
+            <h2 id="stage-latest-heading">Sin escaneos en esta etapa</h2>
+            <p id="stage-latest-body" class="card-sub">Presiona el botón inferior para registrar una evaluación en esta fase.</p>
+          </article>
+
+          <article class="card">
+            <div class="card-header">
+              <div>
+                <h2>Tripulante</h2>
+                <p class="card-sub">Verde = indicadores estables; rojo = zona destacada por la situación.</p>
+              </div>
+              <span class="tag-pill">MODELO 3D GLB</span>
+            </div>
+            <div id="stage-3d-slot" class="canvas-wrapper"></div>
+            <p class="canvas-footer-note">La malla del archivo tiene corazón, pulmones, cerebro, esqueleto y órganos.</p>
+            <button type="button" id="btn-stage-register" class="primary-btn">
+              <span>✳</span> Registrar escaneo en esta etapa
+            </button>
+          </article>
+        </div>
+
+        <div class="split-right">
+          <article class="card">
+            <div class="card-header">
+              <div>
+                <h2>Registros de esta etapa</h2>
+                <p class="card-sub">Historial filtrado por fase de misión</p>
+              </div>
+            </div>
+            <div id="stage-records-list" class="history-list"></div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== PESTAÑA 2: SIGNOS ==================== -->
     <section id="view-signos" class="tab-view">
       <div class="greeting-block">
         <h1>Seguimiento de misión</h1>
         <p class="lead-text">Signos vitales de demostración · cambian cada 4 segundos</p>
       </div>
 
-      <article class="card notice-card">
-        <span class="notice-title">LECTURAS SIMULADAS</span>
-        <p class="card-sub">Sirven para revisar la interfaz y el flujo de seguimiento. No son mediciones de una persona.</p>
-        <p class="notice-time">Actualización: <strong id="vital-timestamp">--:--:--</strong></p>
-      </article>
+      <div class="desktop-split-grid">
+        <div class="split-left">
+          <article class="card notice-card">
+            <span class="notice-title">LECTURAS SIMULADAS</span>
+            <p class="card-sub">Sirven para revisar la interfaz y el flujo de seguimiento. No son mediciones de una persona.</p>
+            <p class="notice-time">Actualización: <strong id="vital-timestamp">--:--:--</strong></p>
+          </article>
 
-      <div class="vitals-stack">
-        <article class="card vital-card">
-          <span class="vital-label">Frecuencia cardíaca</span>
-          <div id="vital-hr" class="vital-value">78 lpm</div>
-          <span class="vital-note">Ejemplo variable no clínico</span>
-        </article>
+          <div class="vitals-stack">
+            <article class="card vital-card">
+              <span class="vital-label">Frecuencia cardíaca</span>
+              <div id="vital-hr" class="vital-value">77 lpm</div>
+              <span class="vital-note">Ejemplo variable no clínico</span>
+            </article>
 
-        <article class="card vital-card">
-          <span class="vital-label">Oxígeno en sangre</span>
-          <div id="vital-spo2" class="vital-value">98 %</div>
-          <span class="vital-note">Ejemplo variable no clínico</span>
-        </article>
+            <article class="card vital-card">
+              <span class="vital-label">Oxígeno en sangre</span>
+              <div id="vital-spo2" class="vital-value">98 %</div>
+              <span class="vital-note">Ejemplo variable no clínico</span>
+            </article>
 
-        <article class="card vital-card">
-          <span class="vital-label">Temperatura corporal</span>
-          <div id="vital-temp" class="vital-value">36.7 °C</div>
-          <span class="vital-note">Ejemplo variable no clínico</span>
-        </article>
+            <article class="card vital-card">
+              <span class="vital-label">Temperatura corporal</span>
+              <div id="vital-temp" class="vital-value">36.3 °C</div>
+              <span class="vital-note">Ejemplo variable no clínico</span>
+            </article>
 
-        <article class="card vital-card">
-          <span class="vital-label">Sueño</span>
-          <div id="vital-sleep" class="vital-value">7.2 h</div>
-          <span class="vital-note">Ejemplo variable no clínico</span>
-        </article>
+            <article class="card vital-card">
+              <span class="vital-label">Sueño</span>
+              <div id="vital-sleep" class="vital-value">6.9 h</div>
+              <span class="vital-note">Ejemplo variable no clínico</span>
+            </article>
 
-        <article class="card vital-card">
-          <span class="vital-label">Estrés</span>
-          <div id="vital-stress" class="vital-value">24 /100</div>
-          <span class="vital-note">Ejemplo variable no clínico</span>
-        </article>
+            <article class="card vital-card">
+              <span class="vital-label">Estrés</span>
+              <div id="vital-stress" class="vital-value">43 /100</div>
+              <span class="vital-note">Ejemplo variable no clínico</span>
+            </article>
+          </div>
+        </div>
+
+        <div class="split-right">
+          <article class="card">
+            <div class="card-header">
+              <div>
+                <h2>Efectos acumulados de misión</h2>
+                <p id="cumulative-horizon" class="card-sub">Horizonte: 180 días · duración fija del perfil</p>
+              </div>
+              <span class="tag-pill">MODEL/RISK.JS</span>
+            </div>
+
+            <div class="telemetry-log-box">
+              <p class="log-muted">Hueso (columna): pendiente · falta radiación válida</p>
+              <p class="log-highlight" id="cumulative-femur">Hueso (fémur): 84.0% de índice estimado</p>
+              <p class="log-highlight" id="cumulative-muscle">Músculo (piernas): 100.0% de índice estimado</p>
+            </div>
+
+            <div class="accordion-list">
+              <details class="accordion-item">
+                <summary>+ Huesos: cómo revisar</summary>
+                <p>En microgravedad prolongada se reduce la carga mecánica sobre columna lumbar y fémur. Se recomienda ejercicio resistivo diario (ARED) y monitoreo densitométrico.</p>
+              </details>
+              <details class="accordion-item">
+                <summary>+ Músculos: cómo revisar</summary>
+                <p>Los grupos posturales y de extremidades inferiores pierden masa sin gravedad. Evalúa fuerza de agarre, resistencia en cinta y protocolo de contramedidas.</p>
+              </details>
+              <details class="accordion-item">
+                <summary>+ Índice cardíaco</summary>
+                <p>El desplazamiento cefálico de fluidos modifica el volumen sistólico. El índice cardíaco requiere telemetría de frecuencia y validación de respuesta API.</p>
+              </details>
+              <details class="accordion-item">
+                <summary>+ Radiación: cómo interpretar</summary>
+                <p>DosTel mide tasa de dosis absorbida (µGy/h). Valores elevados durante tormentas solares incrementan el riesgo acumulativo en tejidos formadores de sangre.</p>
+              </details>
+              <details class="accordion-item">
+                <summary>+ Clima espacial: respuesta operativa</summary>
+                <p>Ante llamaradas clase M o X en los últimos 30 días, se prioriza resguardo en módulos con mayor blindaje y seguimiento de dosimetría.</p>
+              </details>
+            </div>
+
+            <p class="disclaimer-text">Modelo experimental adaptado de model/risk.js: no es diagnóstico ni pronóstico clínico.</p>
+            <button type="button" id="btn-refresh-cumulative" class="secondary-btn full-width-btn">
+              Actualizar datos de clima espacial
+            </button>
+          </article>
+        </div>
       </div>
     </section>
 
-    <!-- ==================== VISTA 3: HISTORIAL ==================== -->
+    <!-- ==================== PESTAÑA 3: HISTORIAL ==================== -->
     <section id="view-historial" class="tab-view">
       <div class="greeting-row">
         <div>
@@ -216,7 +323,7 @@
       <div id="history-list" class="history-list"></div>
     </section>
 
-    <!-- ==================== VISTA 4: PERFIL ==================== -->
+    <!-- ==================== PESTAÑA 4: PERFIL ==================== -->
     <section id="view-perfil" class="tab-view">
       <div class="greeting-block">
         <h1>Perfil del tripulante</h1>
@@ -226,7 +333,7 @@
       <form id="profile-form" class="card profile-form">
         <div class="field-group">
           <label for="prof-name">Nombre</label>
-          <input type="text" id="prof-name" class="dark-input" placeholder="Ej. Alex Rivera" />
+          <input type="text" id="prof-name" class="dark-input" placeholder="Ej. Marlon" />
         </div>
 
         <div class="form-row-2">
@@ -257,7 +364,7 @@
           </div>
           <div class="field-group">
             <label for="prof-duration">Duración total de misión (días)</label>
-            <input type="number" id="prof-duration" class="dark-input" placeholder="Ej. 180 días en total" />
+            <input type="number" id="prof-duration" class="dark-input" placeholder="Ej. 360 días en total" />
           </div>
         </div>
 
@@ -267,7 +374,45 @@
     </section>
   </div>
 
-  <!-- Barra de Navegación Inferior fija (igual a la APK) -->
+  <!-- ==================== MODAL 1: ¿EN QUÉ ETAPA ESTÁS? ==================== -->
+  <div id="modal-stage" class="modal-backdrop hidden" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <h3>¿En qué etapa estás?</h3>
+      <div class="modal-options">
+        <button type="button" class="modal-option-btn" data-stage-choice="before" data-label="Escaneo inicial · antes del viaje">
+          Escaneo inicial · antes del viaje
+        </button>
+        <button type="button" class="modal-option-btn" data-stage-choice="before" data-label="Escaneo al salir del planeta">
+          Escaneo al salir del planeta
+        </button>
+        <button type="button" class="modal-option-btn" data-stage-choice="during" data-label="Nuevo escaneo durante la estancia">
+          Nuevo escaneo durante la estancia
+        </button>
+        <button type="button" class="modal-option-btn" data-stage-choice="after" data-label="Escaneo posterior · regreso">
+          Escaneo posterior · regreso
+        </button>
+      </div>
+      <div class="modal-footer">
+        <button type="button" id="btn-cancel-stage" class="modal-cancel-btn">CANCELAR</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL 2: ¿QUÉ SITUACIÓN QUIERES EVALUAR? ==================== -->
+  <div id="modal-situation" class="modal-backdrop hidden" role="dialog" aria-modal="true">
+    <div class="modal-card modal-tall">
+      <h3>¿Qué situación quieres evaluar? (simulación)</h3>
+      <div id="situation-options-list" class="modal-options scrollable-options"></div>
+      <div class="modal-footer">
+        <button type="button" id="btn-cancel-situation" class="modal-cancel-btn">CANCELAR</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast flotante estilo Android -->
+  <div id="toast-banner" class="toast-banner hidden"></div>
+
+  <!-- Barra de Navegación Inferior -->
   <nav class="bottom-nav" aria-label="Navegación principal">
     <button type="button" class="nav-btn active" data-target="view-inicio">
       <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8">
